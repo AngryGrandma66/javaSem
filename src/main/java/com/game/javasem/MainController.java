@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,29 +22,30 @@ public class MainController {
     @FXML private ImageView character;
     @FXML private Pane tileLayer;
 
-    // Movement flags
     private boolean movingUp, movingDown, movingLeft, movingRight;
-    private final double SPEED = 200; // px/s
+    private final double SPEED = 200; // pixels per second
 
     private AnimationTimer animationTimer;
     private long lastTime;
 
-    /**
-     * Called by FXMLLoader after loading FXML. Initializes grid and movement.
-     */
+    /** Called by FXMLLoader after FXML load */
     public void initialize(Scene scene) {
         loadGridLayout("layouts/Room1.json");
         bindMovement(scene);
     }
 
+    /**
+     * Loads grid layout from JSON and populates tileLayer with ImageViews
+     */
     private void loadGridLayout(String jsonPath) {
-        try (InputStream is = getClass().getResourceAsStream(jsonPath);
-             Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+        try (InputStream is = getClass().getResourceAsStream(jsonPath)) {
+            if (is == null) {
+                System.err.println("Layout JSON not found: " + jsonPath);
+                return;
+            }
+            Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
-            List<List<String>> layout = mapper.readValue(
-                    reader,
-                    new TypeReference<List<List<String>>>() {}
-            );
+            List<List<String>> layout = mapper.readValue(reader, new TypeReference<>() {});
 
             int rows = layout.size();
             int cols = layout.get(0).size();
@@ -52,11 +54,9 @@ public class MainController {
 
             for (int r = 0; r < rows; r++) {
                 for (int c = 0; c < cols; c++) {
-                    String spriteName = layout.get(r).get(c);
-                    if (spriteName != null && !spriteName.isEmpty()) {
-                        Image img = new Image(
-                                Objects.requireNonNull(getClass().getResourceAsStream("images/" + spriteName))
-                        );
+                    String sprite = layout.get(r).get(c);
+                    if (sprite != null && !sprite.isEmpty()) {
+                        Image img = new Image(getClass().getResourceAsStream("images/" + sprite));
                         ImageView iv = new ImageView(img);
                         iv.setFitWidth(cellW);
                         iv.setFitHeight(cellH);
@@ -71,25 +71,29 @@ public class MainController {
         }
     }
 
+    /**
+     * Sets up key handling and starts the animation loop
+     */
     private void bindMovement(Scene scene) {
         scene.setOnKeyPressed(e -> {
             switch (e.getCode()) {
-                case UP, W -> movingUp = true;
-                case DOWN, S -> movingDown = true;
-                case LEFT, A -> movingLeft = true;
+                case UP, W    -> movingUp = true;
+                case DOWN, S  -> movingDown = true;
+                case LEFT, A  -> movingLeft = true;
                 case RIGHT, D -> movingRight = true;
                 default -> {}
             }
         });
         scene.setOnKeyReleased(e -> {
             switch (e.getCode()) {
-                case UP, W -> movingUp = false;
-                case DOWN, S -> movingDown = false;
-                case LEFT, A -> movingLeft = false;
+                case UP, W    -> movingUp = false;
+                case DOWN, S  -> movingDown = false;
+                case LEFT, A  -> movingLeft = false;
                 case RIGHT, D -> movingRight = false;
                 default -> {}
             }
         });
+
         animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -99,15 +103,41 @@ public class MainController {
                 }
                 double delta = (now - lastTime) / 1e9;
                 lastTime = now;
-                double dx = 0, dy = 0;
-                if (movingUp)    dy -= SPEED * delta;
-                if (movingDown)  dy += SPEED * delta;
-                if (movingLeft)  dx -= SPEED * delta;
-                if (movingRight) dx += SPEED * delta;
-                character.setX(character.getX() + dx);
-                character.setY(character.getY() + dy);
+
+                double dx = (movingRight ? SPEED : 0) - (movingLeft ? SPEED : 0);
+                double dy = (movingDown ? SPEED : 0) - (movingUp ? SPEED : 0);
+
+                attemptMove(dx * delta, dy * delta);
             }
         };
         animationTimer.start();
+    }
+
+    /**
+     * Tries to move the character by dx, dy, with bounding-box collision against tiles
+     */
+    private void attemptMove(double dx, double dy) {
+        // Horizontal move
+        character.setX(character.getX() + dx);
+        if (checkCollision()) {
+            character.setX(character.getX() - dx);
+        }
+        // Vertical move
+        character.setY(character.getY() + dy);
+        if (checkCollision()) {
+            character.setY(character.getY() - dy);
+        }
+    }
+
+    /**
+     * Returns true if character intersects any impassable tile
+     */
+    private boolean checkCollision() {
+        for (Node tile : tileLayer.getChildren()) {
+            if (character.getBoundsInParent().intersects(tile.getBoundsInParent())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

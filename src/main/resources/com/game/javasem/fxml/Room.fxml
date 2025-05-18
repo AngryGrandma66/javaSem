@@ -10,13 +10,13 @@
     <children>
         <!-- Background map image -->
         <ImageView fx:id="mapView"
-                   fitWidth="800" fitHeight="600"
-                   pickOnBounds="true"
+                   fitWidth="1280" fitHeight="720"
+                   pickOnBounds="true" preserveRatio="false"
                    style="-fx-border-color: red; -fx-border-width: 4; -fx-border-style: solid;">
             <Image url="@../images/background.png"/>
         </ImageView>
         <Pane fx:id="tileLayer"
-              prefWidth="800" prefHeight="600" />
+              prefWidth="1280" prefHeight="720" />
         <!-- Character sprite -->
         <ImageView fx:id="character"
                    layoutX="400" layoutY="300"

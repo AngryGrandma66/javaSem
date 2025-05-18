@@ -1,14 +1,14 @@
  [
-   [null, "treasure.png", null,null,null,null,null,null,null,null,null,null],
-   [null, "treasure.png", null,null,null,null,null,null,null,null,null,null],
-   [null, "treasure.png", null,null,null,null,null,null,null,null,null,null],
-   [null, "treasure.png", null,null,null,null,null,null,null,null,null,null],
-   [null, "treasure.png", null,null,null,null,null,null,null,null,null,null],
-   [null, "treasure.png", null,null,null,null,null,null,null,null,null,null],
-   [null, "treasure.png", null,null,null,null,null,null,null,null,null,null],
-   [null, "treasure.png", null,null,null,null,null,null,null,null,null,null],
-   [null, "treasure.png", null,null,null,null,null,null,null,null,null,null],
-   [null, "treasure.png", null,null,null,null,null,null,null,null,null,null],
-   [null, "treasure.png", null,null,null,null,null,null,null,null,null,null],
-   [null, "treasure.png", null,null,null,null,null,null,null,null,null,null]
+   ["wall.png", "wall.png", "wall.png","wall.png", "wall.png", "wall.png","wall.png", "wall.png", "wall.png","wall.png", "wall.png", "wall.png"],
+   ["wall.png", null, null,null,null,null,null,null,null,null,null,"wall.png"],
+    ["wall.png", null, null,null,null,null,null,null,null,null,null,"wall.png"],
+    ["wall.png", null, null,null,null,null,null,null,null,null,null,"wall.png"],
+    ["wall.png", null, null,null,null,null,null,null,null,null,null,"wall.png"],
+    ["wall.png", null, null,null,null,"treasure.png",null,null,null,null,null,"wall.png"],
+    ["wall.png", null, null,null,null,null,null,null,null,null,null,"wall.png"],
+    ["wall.png", null, null,null,null,null,null,null,null,null,null,"wall.png"],
+    ["wall.png", null, null,null,null,null,null,null,null,null,null,"wall.png"],
+    ["wall.png", null, null,null,null,null,null,null,null,null,null,"wall.png"],
+    ["wall.png", null, null,null,null,null,null,null,null,null,null,"wall.png"],
+    ["wall.png", "wall.png", "wall.png","wall.png", "wall.png", "wall.png","wall.png", "wall.png", "wall.png","wall.png", "wall.png", "wall.png"]
  ]

@@ -4,15 +4,19 @@
 <?import javafx.scene.image.Image?>
 
 <?import javafx.scene.image.Image?>
+<?import javafx.scene.layout.Pane?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.game.javasem.MainController">
+
     <children>
         <!-- Background map image -->
         <ImageView fx:id="mapView"
                    fitWidth="800" fitHeight="600"
-                   pickOnBounds="true">
+                   pickOnBounds="true"
+                   style="-fx-border-color: red; -fx-border-width: 4; -fx-border-style: solid;">
             <Image url="@../images/background.png"/>
         </ImageView>
-
+        <Pane fx:id="tileLayer"
+              prefWidth="800" prefHeight="600" />
         <!-- Character sprite -->
         <ImageView fx:id="character"
                    layoutX="400" layoutY="300"

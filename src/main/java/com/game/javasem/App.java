@@ -19,7 +19,7 @@ public class App extends Application {
         stage.show();
         // Pass scene to controller to capture key presses
         MainController controller = fxmlLoader.getController();
-        controller.bindMovement(scene);
+        controller.initialize(scene);
 
 
     }

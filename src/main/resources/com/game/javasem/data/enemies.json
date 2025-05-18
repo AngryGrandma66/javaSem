@@ -1,0 +1,10 @@
+{
+  "bat": {
+    "sprite": "bat.png",
+    "fly": true
+  },
+  "goblin": {
+    "sprite": "goblin.png",
+    "fly": false
+  }
+}

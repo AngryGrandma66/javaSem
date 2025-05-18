@@ -1,0 +1,8 @@
+{
+  "wall": {
+    "sprite": "wall.png"
+  },
+  "rock": {
+    "sprite": "rock.png"
+  }
+}

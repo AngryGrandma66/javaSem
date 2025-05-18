@@ -1,0 +1,10 @@
+{
+  "potion": {
+    "sprite": "potion.png",
+    "equippable": true
+  },
+  "key": {
+    "sprite": "key.png",
+    "equippable":false
+  }
+}

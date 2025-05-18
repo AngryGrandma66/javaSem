@@ -1,0 +1,14 @@
+{
+  "items": {
+    "coin": { "name": "Coin", "sprite": "coin.png" },
+    "key":  { "name": "Key",  "sprite": "key.png" }
+  },
+  "enemies": {
+    "fly":    { "name": "Fly",    "sprite": "fly.png" },
+    "spider": { "name": "Spider", "sprite": "spider.png" }
+  },
+  "obstacles": {
+    "rock": { "name": "Rock", "sprite": "rock.png", "blocking": true },
+    "hole": { "name": "Hole", "sprite": "hole.png", "blocking": true }
+  }
+}

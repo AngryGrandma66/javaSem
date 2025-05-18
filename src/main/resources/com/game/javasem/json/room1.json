@@ -1,0 +1,18 @@
+{
+  "id": "room1",
+  "width": 5,
+  "height": 5,
+  "layout": [
+    ["empty", "empty", "empty", "empty", "empty"],
+    ["empty", "rock",  "empty", "hole",  "empty"],
+    ["empty", "empty", "empty", "coin",  "empty"],
+    ["empty", "fly",   "empty", "empty", "empty"],
+    ["empty", "empty", "empty", "empty", "empty"]
+  ],
+  "doors": {
+    "north": null,
+    "south": "room2",
+    "east":  null,
+    "west":  null
+  }
+}

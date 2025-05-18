@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.image.Image?>
+
+<?import javafx.scene.image.Image?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.game.javasem.MainController">
+    <children>
+        <!-- Background map image -->
+        <ImageView fx:id="mapView"
+                   fitWidth="800" fitHeight="600"
+                   pickOnBounds="true">
+            <Image url="@../images/background.png"/>
+        </ImageView>
+
+        <!-- Character sprite -->
+        <ImageView fx:id="character"
+                   layoutX="400" layoutY="300"
+                   fitWidth="40" fitHeight="40">
+            <Image url="@../images/character.png"/>
+        </ImageView>
+    </children>
+
+
+</AnchorPane>

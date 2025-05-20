@@ -1,0 +1,20 @@
+{ "id": "four_way_room", "flags": [
+"L",
+"B"
+], "layout": [
+[{ "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }],
+[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
+[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
+[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
+[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
+[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
+[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
+[{ "category": "door", "sprite": "DoorLeft" }, null, null, null, { "category": "enemy", "type": "boss" }, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
+[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
+[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
+[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
+[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
+[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
+[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
+[{ "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }]
+] }

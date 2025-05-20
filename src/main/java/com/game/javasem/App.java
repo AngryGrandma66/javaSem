@@ -11,15 +11,15 @@ import java.io.IOException;
 public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("fxml/Room.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("fxml/MainMenu.fxml"));
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root);
         stage.setTitle("JavaFX Map Movement Example");
         stage.setScene(scene);
         stage.show();
         // Pass scene to controller to capture key presses
-        RoomController controller = fxmlLoader.getController();
-        controller.initialize(scene);
+       // RoomController controller = fxmlLoader.getController();
+        // controller.initialize(scene);
 
 
     }

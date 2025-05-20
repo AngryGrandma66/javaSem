@@ -1,11 +1,11 @@
-package com.game.javasem.model;
+package com.game.javasem.model.mapObjects;
 
-import com.game.javasem.RoomController;
+import com.game.javasem.controllers.RoomController;
 
-public class Item extends MapObject {
+public class Enemy extends MapObject {
     private String type;
     private String sprite;
-    private boolean equippable;
+    private boolean fly;
 
     public String getType() {
         return type;
@@ -13,27 +13,22 @@ public class Item extends MapObject {
 
     @Override
     public void onInteract(RoomController controller) {
-        controller.pickupItem(this);
-        markInteracted();
+
     }
 
     public void setType(String type) {
         this.type = type;
     }
-
     public String getSprite() {
         return sprite;
     }
-
     public void setSprite(String sprite) {
         this.sprite = sprite;
     }
-
-    public boolean isEquippable() {
-        return equippable;
+    public boolean isFly() {
+        return fly;
     }
-
-    public void setEquippable(boolean equippable) {
-        this.equippable = equippable;
+    public void setFly(boolean fly) {
+        this.fly = fly;
     }
 }

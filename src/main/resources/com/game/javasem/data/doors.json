@@ -1,0 +1,18 @@
+{
+  "DoorUp": {
+    "sprite": "door.png",
+    "direction":"U"
+  },
+  "DoorDown": {
+    "sprite": "door.png",
+    "direction":"D"
+  },
+  "DoorLeft": {
+    "sprite": "door.png",
+    "direction":"L"
+  },
+  "DoorRight": {
+    "sprite": "door.png",
+    "direction":"R"
+  }
+}

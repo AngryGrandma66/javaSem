@@ -1,6 +1,6 @@
-package com.game.javasem.model;
+package com.game.javasem.model.mapObjects;
 
-import com.game.javasem.RoomController;
+import com.game.javasem.controllers.RoomController;
 
 public class Obstacle extends MapObject {
     private String sprite;

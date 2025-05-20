@@ -6,5 +6,9 @@
   "goblin": {
     "sprite": "goblin.png",
     "fly": false
+  },
+  "boss": {
+    "sprite": "boss.png",
+    "fly": false
   }
 }

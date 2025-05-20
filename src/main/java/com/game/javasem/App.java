@@ -18,7 +18,7 @@ public class App extends Application {
         stage.setScene(scene);
         stage.show();
         // Pass scene to controller to capture key presses
-        MainController controller = fxmlLoader.getController();
+        RoomController controller = fxmlLoader.getController();
         controller.initialize(scene);
 
 

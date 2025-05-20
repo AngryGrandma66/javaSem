@@ -1,5 +1,7 @@
 package com.game.javasem.model;
 
+import com.game.javasem.RoomController;
+
 public class Item extends MapObject {
     private String type;
     private String sprite;
@@ -7,6 +9,12 @@ public class Item extends MapObject {
 
     public String getType() {
         return type;
+    }
+
+    @Override
+    public void onInteract(RoomController controller) {
+        controller.pickupItem(this);
+        markInteracted();
     }
 
     public void setType(String type) {

@@ -1,5 +1,7 @@
 package com.game.javasem.model;
 
+import com.game.javasem.RoomController;
+
 public class Obstacle extends MapObject {
     private String sprite;
 
@@ -11,6 +13,11 @@ public class Obstacle extends MapObject {
     @Override
     public String getType() {
         return "";
+    }
+
+    @Override
+    public void onInteract(RoomController controller) {
+
     }
 
     public void setSprite(String sprite) {

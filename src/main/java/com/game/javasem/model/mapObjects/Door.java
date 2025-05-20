@@ -7,28 +7,20 @@ public class Door extends MapObject {
     private String sprite;
     @JsonProperty("direction")
     private String direction;
-    public String getSprite() {
-        return sprite;
-    }
+
+    // ** new **
+    private transient int row, col;
+    public int  getRow()            { return row; }
+    public int  getCol()            { return col; }
+    public void setPosition(int r, int c) { this.row = r; this.col = c; }
+
+    @Override public String getSprite()           { return sprite; }
+    @Override public String getType()             { return ""; }
+    public String getDirection()                   { return direction; }
+    public void   setDirection(String d)           { this.direction = d; }
 
     @Override
-    public String getType() {
-        return "";
-    }
-
-    public String getDirection() {
-        return direction;
-    }
-
-    public void setDirection(String direction) {
-        this.direction = direction;
-    }
-
     public void onInteract(RoomController controller) {
-        controller.changeRoom(direction);
-    }
-
-    public void setSprite(String sprite) {
-        this.sprite = sprite;
+        controller.changeRoom(this);
     }
 }

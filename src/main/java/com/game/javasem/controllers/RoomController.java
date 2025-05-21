@@ -7,9 +7,11 @@ import com.game.javasem.model.map.Room;
 import com.game.javasem.model.mapObjects.*;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -17,10 +19,12 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +38,10 @@ public class RoomController {
     private ImageView character;
     @FXML
     private Pane tileLayer;
+
+    @FXML private AnchorPane   roomPane;
+    @FXML private StackPane mapPane;
+    private MapController      mapController;
 
     private Stage mapStage;
     private Scene scene;          // ← store the scene here
@@ -58,6 +66,18 @@ public class RoomController {
     private List<List<MapObject>> layout;
 
     public void initialize(Scene scene) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/game/javasem/fxml/MapView.fxml")
+            );
+            Parent mapRoot = loader.load();
+            mapController = loader.getController();
+            mapPane.getChildren().add(mapRoot);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mapPane.setVisible(false);
+        mapPane.setManaged(false);
         loadDefinitions();
         bindKeys(scene);
         timer = new AnimationTimer() {
@@ -194,26 +214,52 @@ public class RoomController {
 
     private void bindKeys(Scene s) {
         s.setOnKeyPressed(e -> {
-            KeyCode code = e.getCode();
-            switch (code) {
-                case UP, W -> movingUp = true;
-                case DOWN, S -> movingDown = true;
-                case LEFT, A -> movingLeft = true;
+            switch (e.getCode()) {
+                case M -> {
+                    toggleMap();
+                    //e.consume();
+                }
+                case UP, W    -> movingUp    = true;
+                case DOWN, S  -> movingDown  = true;
+                case LEFT, A  -> movingLeft  = true;
                 case RIGHT, D -> movingRight = true;
-                case E -> handleInteraction();
-                case M -> showMap();      // ← hook M
+                case E        -> handleInteraction();
             }
         });
         s.setOnKeyReleased(e -> {
             switch (e.getCode()) {
-                case UP, W -> movingUp = false;
-                case DOWN, S -> movingDown = false;
-                case LEFT, A -> movingLeft = false;
+                case UP, W    -> movingUp    = false;
+                case DOWN, S  -> movingDown  = false;
+                case LEFT, A  -> movingLeft  = false;
                 case RIGHT, D -> movingRight = false;
             }
         });
     }
+    private void toggleMap() {
+        boolean showing = mapPane.isVisible();
 
+        // flip the map overlay
+        mapPane.setVisible(!showing);
+        mapPane.setManaged(!showing);
+
+        if (!showing) {
+            // --- map just turned ON ---
+            // pause movement
+            timer.stop();
+            movingUp = movingDown = movingLeft = movingRight = false;
+
+            // draw the map
+            mapController.showMap(dungeonMap, currentRoom.getIndex());
+            mapPane.toFront();
+        } else {
+            // --- map just turned OFF ---
+            mapPane.toBack();
+
+            // resume movement
+            lastTime = 0;    // reset so we don't get a big jump
+            timer.start();
+        }
+    }
     private void moveWithCollision(double dx, double dy) {
         double newX = character.getLayoutX() + dx;
         character.setLayoutX(newX);
@@ -394,52 +440,5 @@ public class RoomController {
         character.setLayoutY(spawnY);
         lastTime = 0;     // so first tick doesn't carry an old timestamp
         timer.start();
-    }
-
-
-    private void showMap() {
-        if (dungeonMap == null) return;
-
-        int size = dungeonMap.getGridSize();
-        Room[] rooms = dungeonMap.getRooms();
-        int current = currentRoom.getIndex();
-
-        // create grid
-        GridPane gp = new GridPane();
-        double cell = 20; // 20px per room
-        for (int r = 0; r < size; r++) {
-            for (int c = 0; c < size; c++) {
-                int idx = r * size + c;
-                Rectangle rect = new Rectangle(cell, cell);
-                rect.setStroke(Color.BLACK);
-
-                if (!rooms[idx].exists()) {
-                    rect.setFill(Color.GRAY);
-                } else if (rooms[idx].isBoss()) {
-                    rect.setFill(Color.DARKRED);
-                } else {
-                    rect.setFill(Color.WHITE);
-                }
-
-                // highlight current room with yellow border
-                if (idx == current) {
-                    rect.setStrokeWidth(3);
-                    rect.setStroke(Color.GOLD);
-                }
-
-                gp.add(rect, c, r);
-            }
-        }
-
-        // lazily create or reuse the mapStage
-        if (mapStage == null) {
-            mapStage = new Stage();
-            mapStage.setTitle("Dungeon Map");
-            mapStage.setScene(new Scene(gp));
-            mapStage.setResizable(false);
-        } else {
-            mapStage.getScene().setRoot(gp);
-        }
-        mapStage.show();
     }
 }

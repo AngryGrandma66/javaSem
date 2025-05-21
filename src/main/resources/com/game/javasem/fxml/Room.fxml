@@ -1,29 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.image.Image?>
-
-<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.Pane?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.game.javasem.controllers.RoomController">
+<?import javafx.scene.image.Image?>
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.game.javasem.controllers.RoomController"
+           prefWidth="1280" prefHeight="720">
 
-    <children>
-        <!-- Background map image -->
-        <ImageView fx:id="mapView"
-                   fitWidth="1280" fitHeight="720"
-                   pickOnBounds="true" preserveRatio="false"
-                   style="-fx-border-color: red; -fx-border-width: 4; -fx-border-style: solid;">
-            <Image url="@../images/background.png"/>
-        </ImageView>
-        <Pane fx:id="tileLayer"
-              prefWidth="1280" prefHeight="720" />
-        <!-- Character sprite -->
-        <ImageView fx:id="character"
-                   layoutX="400" layoutY="300"
-                   fitWidth="40" fitHeight="40">
-            <Image url="@../images/character.png"/>
-        </ImageView>
-    </children>
+    <!-- the normal room UI -->
+    <AnchorPane fx:id="roomPane">
+        <children>
+            <!-- Background map image -->
+            <ImageView fx:id="mapView"
+                       fitWidth="1280" fitHeight="720"
+                       pickOnBounds="true" preserveRatio="false"
+                       style="-fx-border-color: red; -fx-border-width: 4; -fx-border-style: solid;">
+                <Image url="@../images/background.png"/>
+            </ImageView>
 
+            <!-- Tile layer on which we place walls, doors, etc. -->
+            <Pane fx:id="tileLayer"
+                  prefWidth="1280" prefHeight="720"/>
 
-</AnchorPane>
+            <!-- Character sprite -->
+            <ImageView fx:id="character"
+                       layoutX="400" layoutY="300"
+                       fitWidth="40" fitHeight="40">
+                <Image url="@../images/character.png"/>
+            </ImageView>
+        </children>
+    </AnchorPane>
+
+    <!-- the map overview, initially hidden -->
+    <StackPane fx:id="mapPane"
+               visible="false" managed="false"
+               style="-fx-background-color: transparent;">
+        <!-- we’ll inject the GridPane directly here -->
+    </StackPane>
+</StackPane>

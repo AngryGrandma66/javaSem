@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.GridPane?>
+
+<GridPane xmlns:fx="http://javafx.com/fxml"
+          fx:controller="com.game.javasem.controllers.MapController"
+          fx:id="mapGrid"
+          hgap="2" vgap="2"
+          style="-fx-background-color: transparent;"
+          alignment="CENTER"/>

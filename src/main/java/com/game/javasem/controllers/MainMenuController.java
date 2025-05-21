@@ -49,7 +49,7 @@ public class MainMenuController {
 
 // 3) Create the player *with* defaults
             Player player = new Player(
-                    40,
+                    10,
                     starterWeapon,
                     starterArmor,
                     starterAmulet

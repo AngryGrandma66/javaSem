@@ -1,5 +1,6 @@
 package com.game.javasem.controllers;
 
+import com.game.javasem.model.Attack;
 import com.game.javasem.model.map.Room;
 import com.game.javasem.model.mapObjects.*;
 import javafx.scene.image.Image;
@@ -9,6 +10,7 @@ import javafx.scene.layout.Pane;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class RoomRenderer {
     private final Pane tileLayer;
@@ -65,7 +67,29 @@ public class RoomRenderer {
                         door.setPosition(r, c);
                     }
                 }
-
+                if (obj instanceof Enemy e) {
+                    Map<String,Object> def = enemyDefs.get(e.getType());
+                    if (def != null) {
+                        e.setSprite((String)def.get("sprite"));
+                        int hp = ((Number)def.get("health")).intValue();
+                        e.setHealth(hp);
+                        e.setCurrentHealth(hp);
+                        @SuppressWarnings("unchecked")
+                        List<Map<String,Object>> atks = (List<Map<String,Object>>)def.get("attacks");
+                        List<Attack> atkList = atks.stream().map(m ->
+                                new Attack(
+                                        (String)m.get("name"),
+                                        ((Number)m.get("damage")).intValue(),
+                                        ((Number)m.get("cooldown")).intValue()
+                                )
+                        ).collect(Collectors.toList());
+                        e.setAttacks(atkList);
+                        @SuppressWarnings("unchecked")
+                        List<String> loot = (List<String>)def.get("lootPool");
+                        e.setLootPool(loot);
+                        e.setBoss((Boolean)def.get("boss"));
+                    }
+                }
                 String sprite = spriteFor(obj);
                 if (sprite == null) continue;
 
@@ -108,7 +132,7 @@ public class RoomRenderer {
             Map<String, Object> d = doorDefs.get(key);
             if (d != null) return (String) d.get("sprite");
         }
-        if (obj instanceof Chest  && chestDefs != null) {
+        if (obj instanceof Chest && chestDefs != null) {
             key = obj.getSprite();
             Map<String, Object> d = chestDefs.get(key);
             if (d != null) return (String) d.get("sprite");

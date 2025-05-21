@@ -9,7 +9,7 @@
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, null, null, null, { "category": "enemy", "type": "boss" }, null, null, null, null, null, null, null, null, null, null,  { "category": "door", "sprite": "DoorRight" }],
+[{ "category": "obstacle", "sprite": "wall" }, null, null, null, { "category": "enemy", "type": "dragon" }, null, null, null, null, null, null, null, null, null, null,  { "category": "door", "sprite": "DoorRight" }],
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],

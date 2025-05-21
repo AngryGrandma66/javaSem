@@ -93,6 +93,10 @@ public class Player {
         }
     }
 
+    public void setCurrentHealth(int currentHealth) {
+        this.currentHealth = currentHealth;
+    }
+
     public void unequipItem(GameItem.Type slot) {
         switch (slot) {
             case WEAPON -> {

@@ -7,10 +7,7 @@ import com.game.javasem.model.GameItemFactory;
 import com.game.javasem.model.Player;
 import com.game.javasem.model.map.DungeonMap;
 import com.game.javasem.model.map.Room;
-import com.game.javasem.model.mapObjects.Chest;
-import com.game.javasem.model.mapObjects.Door;
-import com.game.javasem.model.mapObjects.Item;
-import com.game.javasem.model.mapObjects.MapObject;
+import com.game.javasem.model.mapObjects.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -20,6 +17,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 
 import java.io.InputStream;
 import java.util.Collections;
@@ -47,6 +45,8 @@ public class RoomController {
     private MapController mapController;
     private InventoryController inventoryController;
 
+    private Scene previousScene;
+    private Stage primaryStage;
     private DungeonMap dungeonMap;
     private Room currentRoom;
     private boolean firstShow = true;
@@ -136,6 +136,7 @@ public class RoomController {
      * Hook up key handling (including M → toggle map).
      */
     public void setScene(Scene scene) {
+
         bindKeys(scene);
 
     }
@@ -254,7 +255,54 @@ public class RoomController {
         }
         interaction.removeTileAt(currentRoom, chest);
     }
+    public void fightEnemy(Enemy enemy) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/game/javasem/fxml/BattleView.fxml")
+            );
+            Parent battleRoot = loader.load();
+            BattleController bc = loader.getController();
+            primaryStage = (Stage) roomPane.getScene().getWindow();
+            previousScene = roomPane.getScene();
+            bc.startBattle(player, enemy, this, previousScene);
+            primaryStage.setScene(new Scene(battleRoot));
+            primaryStage.setTitle("Battle!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
+    /**
+     * Handle end of battle: award loot and transition.
+     */
+    public void handleBattleEnd(Enemy enemy) {
+        List<String> pool = enemy.getLootPool();
+        interaction.removeTileAt(currentRoom,enemy);
+        if (pool != null && !pool.isEmpty()) {
+            String lootId = pool.get(new Random().nextInt(pool.size()));
+            if (gameItemDefs != null && gameItemDefs.containsKey(lootId)) {
+                GameItem loot = gameItemDefs.get(lootId);
+                player.getInventory().addItem(loot);
+            } else {
+                System.err.println("No GameItem definition for loot ID: " + lootId);
+            }
+        }
+
+        if (enemy.isBoss()) {
+            try {
+                Parent root = FXMLLoader.load(
+                        getClass().getResource("/com/game/javasem/fxml/Victory.fxml")
+                );
+                primaryStage.setScene(new Scene(root));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            if (previousScene != null) {
+                primaryStage.setScene(previousScene);
+            }
+        }
+    }
 
     /**
      * Flip between the room‐view and the full‐map overlay.

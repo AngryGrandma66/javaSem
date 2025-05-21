@@ -28,9 +28,9 @@
     "equippable": true,
     "type": "weapon",
     "attacks": [
-      {"name": "Slash", "damage": 12, "cooldown": 1.2},
-      {"name": "Pierce", "damage": 18, "cooldown": 2.5},
-      {"name": "Cleave", "damage": 25, "cooldown": 3.0}
+      {"name": "Slash", "damage": 12, "cooldown": 1},
+      {"name": "Pierce", "damage": 18, "cooldown": 2},
+      {"name": "Cleave", "damage": 25, "cooldown": 3}
     ]
   },
   "runeSword": {
@@ -38,9 +38,9 @@
     "equippable": true,
     "type": "weapon",
     "attacks": [
-      {"name": "Runic Strike", "damage": 15, "cooldown": 1.8},
-      {"name": "Runic Blast", "damage": 20, "cooldown": 2.8},
-      {"name": "Arcane Slash", "damage": 22, "cooldown": 3.2}
+      {"name": "Runic Strike", "damage": 15, "cooldown": 2},
+      {"name": "Runic Blast", "damage": 20, "cooldown": 2},
+      {"name": "Arcane Slash", "damage": 22, "cooldown": 3}
     ]
   },
   "magicBlade": {
@@ -48,9 +48,9 @@
     "equippable": true,
     "type": "weapon",
     "attacks": [
-      {"name": "Arc Slash", "damage": 14, "cooldown": 1.5},
-      {"name": "Magic Thrust", "damage": 19, "cooldown": 2.2},
-      {"name": "Blade Storm", "damage": 27, "cooldown": 3.5}
+      {"name": "Arc Slash", "damage": 14, "cooldown": 1},
+      {"name": "Magic Thrust", "damage": 19, "cooldown": 2},
+      {"name": "Blade Storm", "damage": 27, "cooldown": 4}
     ]
   },
   "ironDagger": {
@@ -58,9 +58,9 @@
     "equippable": true,
     "type": "weapon",
     "attacks": [
-      {"name": "Quick Stab", "damage": 8, "cooldown": 0.8},
-      {"name": "Backstab", "damage": 15, "cooldown": 2.0},
-      {"name": "Flick", "damage": 10, "cooldown": 1.0}
+      {"name": "Quick Stab", "damage": 8, "cooldown": 1},
+      {"name": "Backstab", "damage": 15, "cooldown": 2},
+      {"name": "Flick", "damage": 10, "cooldown": 2}
     ]
   },
   "fireAmulet": {

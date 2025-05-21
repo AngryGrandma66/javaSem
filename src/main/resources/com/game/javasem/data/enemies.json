@@ -1,14 +1,35 @@
 {
   "bat": {
     "sprite": "bat.png",
-    "fly": true
+    "health": 30,
+    "attacks": [
+      { "name": "Swoop", "damage": 5, "cooldown": 1 },
+      { "name": "Bite",  "damage": 8, "cooldown": 2 },
+      { "name": "Flap",  "damage": 3, "cooldown": 1 }
+    ],
+    "lootPool": [ "key"],
+    "boss": false
   },
   "goblin": {
     "sprite": "goblin.png",
-    "fly": false
+    "health": 50,
+    "attacks": [
+      { "name": "Slash",    "damage": 10, "cooldown": 1 },
+      { "name": "Club Hit", "damage": 12, "cooldown": 2 },
+      { "name": "Throw",    "damage": 6,  "cooldown": 2 }
+    ],
+    "lootPool": [ "key" ],
+    "boss": false
   },
-  "boss": {
-    "sprite": "boss.png",
-    "fly": false
+  "dragon": {
+    "sprite": "dragon.png",
+    "health": 1,
+    "attacks": [
+      { "name": "Fire Breath", "damage": 20, "cooldown": 3 },
+      { "name": "Tail Swipe",  "damage": 25, "cooldown": 3 },
+      { "name": "Claw Strike", "damage": 15, "cooldown": 2 }
+    ],
+    "lootPool": [ "excalibur", "magicBlade", "lightningRing" ],
+    "boss": true
   }
 }

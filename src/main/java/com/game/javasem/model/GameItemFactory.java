@@ -10,10 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class GameItemFactory {
-    private static final String ITEMS_JSON = "/com/game/javasem/data/items.json";
-    private static final String IMAGE_BASE  = "/com/game/javasem/images/";
-
-    /**
+        /**
      * @return a map from the JSON key (e.g. "excalibur") to a fully constructed GameItem
      */
     public static Map<String, GameItem> loadAll() throws IOException {
@@ -60,7 +57,7 @@ public class GameItemFactory {
                             .map(m -> new Attack(
                                     (String)  m.get("name"),
                                     ((Number) m.get("damage")).intValue(),
-                                    ((Number) m.get("cooldown")).doubleValue()
+                                    ((Number) m.get("cooldown")).intValue()
                             ))
                             .collect(Collectors.toList());
                     items.put(id, GameItem.createWeapon(id, icon, attacks));
@@ -74,11 +71,8 @@ public class GameItemFactory {
                     double am = ((Number) def.get("attackMultiplier")).doubleValue();
                     items.put(id, GameItem.createAmulet(id, icon, hm, am));
                 }
-                case "key", "consumable" -> {
-                    items.put(id, GameItem.createConsumable(id, icon));
-                }
+                case "key", "consumable" -> items.put(id, GameItem.createConsumable(id, icon));
                 default -> {
-                    // unknown type: skip or log
                 }
             }
         }

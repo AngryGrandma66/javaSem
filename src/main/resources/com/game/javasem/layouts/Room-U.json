@@ -11,7 +11,7 @@
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, { "category": "item", "type": "goldenArmor" }, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
+[{ "category": "obstacle", "sprite": "wall" }, null, null,{ "category": "enemy", "type": "goblin" }, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],

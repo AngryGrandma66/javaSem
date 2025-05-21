@@ -3,11 +3,31 @@ package com.game.javasem.model;
 public class Attack {
     private String name;
     private int damage;
-    private double cooldown;
-    public Attack(String name, int damage, double cooldown) {
-        this.name = name; this.damage = damage; this.cooldown = cooldown;
+    private int cooldown;
+
+    public Attack() {
     }
-    public String getName() { return name; }
-    public int getDamage() { return damage; }
-    public double getCooldown() { return cooldown; }
+
+    public Attack(String name, int damage, int cooldown) {
+        this.name = name;
+        this.damage = damage;
+        this.cooldown = cooldown;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getDamage() {
+        return damage;
+    }
+
+    public int getCooldown() {
+        return cooldown;
+    }
+
+    @Override
+    public String toString() {
+        return name + "(" + damage + " dmg, " + cooldown + " turns)";
+    }
 }

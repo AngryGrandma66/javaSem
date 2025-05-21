@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.game.javasem.controllers.BattleController"
+            prefWidth="600" prefHeight="400">
+    <VBox alignment="CENTER" spacing="20" AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
+          AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
+        <!-- Health bars and sprites -->
+        <HBox alignment="CENTER" spacing="50">
+            <VBox alignment="CENTER" spacing="5">
+                <Label text="Enemy" />
+                <ProgressBar fx:id="enemyHealthBar" prefWidth="200" />
+                <ImageView fx:id="enemySprite" fitWidth="64" fitHeight="64" />
+            </VBox>
+            <VBox alignment="CENTER" spacing="5">
+                <Label text="Player" />
+                <ProgressBar fx:id="playerHealthBar" prefWidth="200" />
+                <ImageView fx:id="playerSprite" fitWidth="64" fitHeight="64" />
+            </VBox>
+        </HBox>
+        <!-- Attack buttons -->
+        <HBox fx:id="attackButtons" alignment="CENTER" spacing="10" />
+    </VBox>
+</AnchorPane>

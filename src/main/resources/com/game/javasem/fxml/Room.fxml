@@ -37,4 +37,12 @@
                style="-fx-background-color: transparent;">
         <!-- we’ll inject the GridPane directly here -->
     </StackPane>
+    <!-- the inventory overlay, initially hidden -->
+    <StackPane fx:id="inventoryPane"
+               prefWidth="1280" prefHeight="720"
+               visible="false" managed="false"
+               style="-fx-background-color: transparent;"
+               alignment="CENTER">
+        <!-- InventoryView.fxml injected here in controller -->
+    </StackPane>
 </StackPane>

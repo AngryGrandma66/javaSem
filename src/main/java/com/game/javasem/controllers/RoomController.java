@@ -2,8 +2,12 @@ package com.game.javasem.controllers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.game.javasem.model.GameItem;
+import com.game.javasem.model.GameItemFactory;
+import com.game.javasem.model.Player;
 import com.game.javasem.model.map.DungeonMap;
 import com.game.javasem.model.map.Room;
+import com.game.javasem.model.mapObjects.Chest;
 import com.game.javasem.model.mapObjects.Door;
 import com.game.javasem.model.mapObjects.Item;
 import com.game.javasem.model.mapObjects.MapObject;
@@ -18,9 +22,14 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class RoomController {
+    @FXML
+    public StackPane inventoryPane;
     @FXML
     private ImageView mapView;
     @FXML
@@ -34,7 +43,9 @@ public class RoomController {
     private RoomRenderer renderer;
     private MovementController movement;
     private InteractionService interaction;
+
     private MapController mapController;
+    private InventoryController inventoryController;
 
     private DungeonMap dungeonMap;
     private Room currentRoom;
@@ -43,8 +54,13 @@ public class RoomController {
     private Map<String, Map<String, Object>> itemDefs;
     private Map<String, Map<String, Object>> enemyDefs;
     private Map<String, Map<String, Object>> doorDefs;
+    private Map<String, Map<String, Object>> chestDefs;
+
     private double cellW, cellH;
 
+    private Map<String, GameItem> gameItemDefs;
+    private Player player;
+    private boolean inventoryVisible = false;
 
     @FXML
     public void initialize() {
@@ -56,6 +72,13 @@ public class RoomController {
             Parent mapRoot = loader.load();
             mapController = loader.getController();
             mapPane.getChildren().add(mapRoot);
+
+            FXMLLoader invLoader = new FXMLLoader(
+                    getClass().getResource("/com/game/javasem/fxml/InventoryView.fxml")
+            );
+            Parent invRoot = invLoader.load();
+            inventoryPane.getChildren().add(invRoot);
+            inventoryController = invLoader.getController();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -63,12 +86,15 @@ public class RoomController {
         // 2) initially hide the map overlay
         mapPane.setVisible(false);
         mapPane.setManaged(false);
+        inventoryPane.setVisible(false);
+        inventoryPane.setManaged(false);
 
         // 3) instantiate your four helper classes
-        renderer = new RoomRenderer(tileLayer, mapView, obstacleDefs, itemDefs, enemyDefs, doorDefs);
+        renderer = new RoomRenderer(tileLayer, mapView, obstacleDefs, itemDefs, enemyDefs, doorDefs,chestDefs);
         movement = new MovementController(character, tileLayer);
         interaction = new InteractionService(tileLayer);
 
+        inventoryController.setPlayer(this.player);
 // after renderer.render(room):
         interaction.updateCellSize(renderer.getCellWidth(), renderer.getCellHeight());
         cellH = interaction.getCellH();
@@ -80,6 +106,7 @@ public class RoomController {
     private void bindKeys(Scene s) {
         s.setOnKeyPressed(e -> {
             switch (e.getCode()) {
+                case I -> toggleInventory();
                 case M -> toggleMap();
                 case UP, W -> movement.setMovingUp(true);
                 case DOWN, S -> movement.setMovingDown(true);
@@ -111,6 +138,10 @@ public class RoomController {
     public void setScene(Scene scene) {
         bindKeys(scene);
 
+    }
+
+    public void setPlayer(Player p) {
+        this.player = p;
     }
 
     /**
@@ -168,13 +199,12 @@ public class RoomController {
 
         // find the entry‐door via a labeled break
         Door entry = null;
-        outer:
         for (int r = 0; r < next.getLayout().size(); r++) {
             for (int c = 0; c < next.getLayout().get(r).size(); c++) {
                 MapObject mo = next.getLayout().get(r).get(c);
                 if (mo instanceof Door d && opposite.equals(d.getDirection())) {
                     entry = d;
-                    break outer;
+                    break;
                 }
             }
         }
@@ -191,9 +221,40 @@ public class RoomController {
 
     public void pickupItem(Item item) {
         // update your model
+
+        GameItem gameItem = gameItemDefs.get(item.getType());
+        if (gameItem != null) {
+            player.getInventory().addItem(gameItem);
+            System.out.println(player.getInventory().toString());
+        }
         interaction.removeTileAt(currentRoom, item);
         System.out.println("Picked up " + item.getType());
     }
+
+    public void openChest(Chest chest) {
+        // require a key to open
+        GameItem keyItem = gameItemDefs.get("key");
+        if (keyItem == null || !player.getInventory().getItems().contains(keyItem)) {
+            System.out.println("You need a key to open this chest!");
+            return;
+        }
+        // remove one key from inventory
+        player.getInventory().removeItem(keyItem);
+
+        // lookup loot pool
+        @SuppressWarnings("unchecked")
+        List<String> pool = (List<String>) chestDefs.get(chest.getSprite()).get("lootPool");
+        if (pool != null && !pool.isEmpty()) {
+            String lootId = pool.get(new Random().nextInt(pool.size()));
+            GameItem loot = gameItemDefs.get(lootId);
+            if (loot != null) {
+                player.getInventory().addItem(loot);
+                System.out.println("You found " + loot.getName() + "!");
+            }
+        }
+        interaction.removeTileAt(currentRoom, chest);
+    }
+
 
     /**
      * Flip between the room‐view and the full‐map overlay.
@@ -217,8 +278,29 @@ public class RoomController {
 
     }
 
+    private void toggleInventory() {
+        if (inventoryPane == null) return;
+        inventoryVisible = !inventoryVisible;
+        inventoryPane.setVisible(inventoryVisible);
+        if (inventoryVisible) {
+            // Refresh the inventory UI each time it's shown, in case of changes
+            inventoryController.refreshUI();
+            inventoryPane.toFront();  // bring overlay to top if using StackPane
+        } else {
+            inventoryPane.toBack();   // optional: send it behind when hidden
+        }
+    }
+
+
     private void loadDefinitions() {
         ObjectMapper mapper = new ObjectMapper();
+        try {
+            // load all GameItem objects
+            gameItemDefs = GameItemFactory.loadAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+            gameItemDefs = Collections.emptyMap();
+        }
         try (InputStream in = getClass().getResourceAsStream("/com/game/javasem/data/obstacles.json")) {
             if (in != null) obstacleDefs = mapper.readValue(in, new TypeReference<>() {
             });
@@ -241,6 +323,12 @@ public class RoomController {
         }
         try (InputStream in = getClass().getResourceAsStream("/com/game/javasem/data/doors.json")) {
             if (in != null) doorDefs = mapper.readValue(in, new TypeReference<>() {
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try (InputStream in = getClass().getResourceAsStream("/com/game/javasem/data/chests.json")) {
+            if (in != null) chestDefs = mapper.readValue(in, new TypeReference<>() {
             });
         } catch (Exception e) {
             e.printStackTrace();

@@ -14,7 +14,6 @@ public class Item extends MapObject {
     @Override
     public void onInteract(RoomController controller) {
         controller.pickupItem(this);
-        markInteracted();
     }
 
     public void setType(String type) {

@@ -9,7 +9,7 @@
   [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
   [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
   [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-  [{ "category": "obstacle", "sprite": "wall" }, null, null, null, { "category": "item", "type": "potion" }, null, null, null, null, null, null, null, null, null, null, { "category": "door", "sprite": "DoorRight" }],
+  [{ "category": "obstacle", "sprite": "wall" }, null, null, null, { "category": "item", "type": "key" }, null, null, null, null, null, null, null, null, null, null, { "category": "door", "sprite": "DoorRight" }],
   [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
   [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
   [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],

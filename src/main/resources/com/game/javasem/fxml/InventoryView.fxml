@@ -1,0 +1,40 @@
+<!-- InventoryView.fxml -->
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.image.ImageView?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.game.javasem.controllers.InventoryController"
+            prefWidth="600.0" prefHeight="400.0" fx:id="inventoryRoot"
+            style="-fx-background-color: rgba(100,100, 100, 0.7);"
+            translateX="200"
+        translateY="90">
+
+    <!-- Semi-transparent background above for overlay effect -->
+    <!-- Grid of inventory slots -->
+    <GridPane fx:id="inventoryGrid" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0"
+              hgap="10" vgap="10">
+        <!-- Inventory gameItem icons will be added here dynamically in the controller -->
+    </GridPane>
+
+    <!-- Equipment slots section -->
+    <VBox fx:id="equipBox" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="300.0" spacing="10">
+        <HBox spacing="5" alignment="CENTER_LEFT">
+            <Label text="Weapon:"/>
+            <ImageView fx:id="weaponSlotIcon" fitWidth="32" fitHeight="32"/>
+        </HBox>
+        <HBox spacing="5" alignment="CENTER_LEFT">
+            <Label text="Armor:"/>
+            <ImageView fx:id="armorSlotIcon" fitWidth="32" fitHeight="32"/>
+        </HBox>
+        <HBox spacing="5" alignment="CENTER_LEFT">
+            <Label text="Amulet:"/>
+            <ImageView fx:id="amuletSlotIcon" fitWidth="32" fitHeight="32"/>
+        </HBox>
+    </VBox>
+
+    <!-- Health display -->
+    <Label fx:id="healthLabel" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0"
+           style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+</AnchorPane>

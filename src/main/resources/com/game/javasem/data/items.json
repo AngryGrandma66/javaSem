@@ -1,10 +1,100 @@
 {
-  "potion": {
-    "sprite": "potion.png",
-    "equippable": true
+  "goldenArmor": {
+    "sprite": "goldenArmor.png",
+    "equippable": true,
+    "type": "armor",
+    "healthBonus": 25
+  },
+  "silverArmor": {
+    "sprite": "silverArmor.png",
+    "equippable": true,
+    "type": "armor",
+    "healthBonus": 15
+  },
+  "bronzeArmor": {
+    "sprite": "bronzeArmor.png",
+    "equippable": true,
+    "type": "armor",
+    "healthBonus": 10
+  },
+  "leatherArmor": {
+    "sprite": "leatherArmor.png",
+    "equippable": true,
+    "type": "armor",
+    "healthBonus": 5
+  },
+  "excalibur": {
+    "sprite": "excalibur.png",
+    "equippable": true,
+    "type": "weapon",
+    "attacks": [
+      {"name": "Slash", "damage": 12, "cooldown": 1.2},
+      {"name": "Pierce", "damage": 18, "cooldown": 2.5},
+      {"name": "Cleave", "damage": 25, "cooldown": 3.0}
+    ]
+  },
+  "runeSword": {
+    "sprite": "excalibur.png",
+    "equippable": true,
+    "type": "weapon",
+    "attacks": [
+      {"name": "Runic Strike", "damage": 15, "cooldown": 1.8},
+      {"name": "Runic Blast", "damage": 20, "cooldown": 2.8},
+      {"name": "Arcane Slash", "damage": 22, "cooldown": 3.2}
+    ]
+  },
+  "magicBlade": {
+    "sprite": "magicBlade.png",
+    "equippable": true,
+    "type": "weapon",
+    "attacks": [
+      {"name": "Arc Slash", "damage": 14, "cooldown": 1.5},
+      {"name": "Magic Thrust", "damage": 19, "cooldown": 2.2},
+      {"name": "Blade Storm", "damage": 27, "cooldown": 3.5}
+    ]
+  },
+  "ironDagger": {
+    "sprite": "ironDagger.png",
+    "equippable": true,
+    "type": "weapon",
+    "attacks": [
+      {"name": "Quick Stab", "damage": 8, "cooldown": 0.8},
+      {"name": "Backstab", "damage": 15, "cooldown": 2.0},
+      {"name": "Flick", "damage": 10, "cooldown": 1.0}
+    ]
+  },
+  "fireAmulet": {
+    "sprite": "fireAmulet.png",
+    "equippable": true,
+    "type": "amulet",
+    "healthMultiplier": 1.0,
+    "attackMultiplier": 1.2
+  },
+  "icePendant": {
+    "sprite": "icePendant.png",
+    "equippable": true,
+    "type": "amulet",
+    "healthMultiplier": 1.2,
+    "attackMultiplier": 1.0
+  },
+  "lightningRing": {
+    "sprite": "lightningRing.png",
+    "equippable": true,
+    "type": "amulet",
+    "healthMultiplier": 1.0,
+    "attackMultiplier": 1.3
+  },
+  "silverBracelet": {
+    "sprite": "silverBracelet.png",
+    "equippable": true,
+    "type": "amulet",
+    "healthMultiplier": 1.1,
+    "attackMultiplier": 1.1
   },
   "key": {
     "sprite": "key.png",
-    "equippable":false
+    "equippable": false,
+    "type": "consumable"
   }
 }
+

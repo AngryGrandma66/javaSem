@@ -1,8 +1,7 @@
 package com.game.javasem.controllers;
 
 import com.game.javasem.model.map.Room;
-import com.game.javasem.model.mapObjects.Door;
-import com.game.javasem.model.mapObjects.MapObject;
+import com.game.javasem.model.mapObjects.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -20,6 +19,7 @@ public class RoomRenderer {
     private final Map<String, Map<String, Object>> itemDefs;
     private final Map<String, Map<String, Object>> enemyDefs;
     private final Map<String, Map<String, Object>> doorDefs;
+    private Map<String, Map<String, Object>> chestDefs;
 
     // most recent cell size, for anyone else who needs it:
     private double cellW, cellH;
@@ -29,23 +29,27 @@ public class RoomRenderer {
                         Map<String, Map<String, Object>> obstacleDefs,
                         Map<String, Map<String, Object>> itemDefs,
                         Map<String, Map<String, Object>> enemyDefs,
-                        Map<String, Map<String, Object>> doorDefs) {
-        this.tileLayer     = tileLayer;
-        this.mapView       = mapView;
-        this.obstacleDefs  = obstacleDefs;
-        this.itemDefs      = itemDefs;
-        this.enemyDefs     = enemyDefs;
-        this.doorDefs      = doorDefs;
+                        Map<String, Map<String, Object>> doorDefs,
+                        Map<String, Map<String, Object>> chestDefs) {
+        this.tileLayer = tileLayer;
+        this.mapView = mapView;
+        this.obstacleDefs = obstacleDefs;
+        this.itemDefs = itemDefs;
+        this.enemyDefs = enemyDefs;
+        this.doorDefs = doorDefs;
+        this.chestDefs = chestDefs;
     }
 
-    /** Draws the given Room onto the tileLayer, replacing whatever was there. */
+    /**
+     * Draws the given Room onto the tileLayer, replacing whatever was there.
+     */
     public void render(Room room) {
         tileLayer.getChildren().clear();
 
         List<List<MapObject>> layout = room.getLayout();
         int rows = layout.size(), cols = layout.get(0).size();
 
-        cellW = mapView.getFitWidth()  / cols;
+        cellW = mapView.getFitWidth() / cols;
         cellH = mapView.getFitHeight() / rows;
 
         for (int r = 0; r < rows; r++) {
@@ -55,10 +59,10 @@ public class RoomRenderer {
 
                 // if it’s a Door, pull direction from doorDefs
                 if (obj instanceof Door door) {
-                    Map<String,Object> def = doorDefs.get(door.getSprite());
+                    Map<String, Object> def = doorDefs.get(door.getSprite());
                     if (def != null) {
-                        door.setDirection((String)def.get("direction"));
-                         door.setPosition(r,c);
+                        door.setDirection((String) def.get("direction"));
+                        door.setPosition(r, c);
                     }
                 }
 
@@ -84,30 +88,42 @@ public class RoomRenderer {
 
     private String spriteFor(MapObject obj) {
         String key;
-        if (obj instanceof com.game.javasem.model.mapObjects.Obstacle && obstacleDefs!=null) {
+        if (obj instanceof Obstacle && obstacleDefs != null) {
             key = obj.getSprite();
-            var d = obstacleDefs.get(key);
-            if (d!=null) return (String)d.get("sprite");
+            Map<String, Object> d = obstacleDefs.get(key);
+            if (d != null) return (String) d.get("sprite");
         }
-        if (obj instanceof com.game.javasem.model.mapObjects.Item && itemDefs!=null) {
+        if (obj instanceof Item && itemDefs != null) {
             key = obj.getType();
-            var d = itemDefs.get(key);
-            if (d!=null) return (String)d.get("sprite");
+            Map<String, Object> d = itemDefs.get(key);
+            if (d != null) return (String) d.get("sprite");
         }
-        if (obj instanceof com.game.javasem.model.mapObjects.Enemy && enemyDefs!=null) {
+        if (obj instanceof Enemy && enemyDefs != null) {
             key = obj.getType();
-            var d = enemyDefs.get(key);
-            if (d!=null) return (String)d.get("sprite");
+            Map<String, Object> d = enemyDefs.get(key);
+            if (d != null) return (String) d.get("sprite");
         }
-        if (obj instanceof Door && doorDefs!=null) {
+        if (obj instanceof Door && doorDefs != null) {
             key = obj.getSprite();
-            var d = doorDefs.get(key);
-            if (d!=null) return (String)d.get("sprite");
+            Map<String, Object> d = doorDefs.get(key);
+            if (d != null) return (String) d.get("sprite");
+        }
+        if (obj instanceof Chest  && chestDefs != null) {
+            key = obj.getSprite();
+            Map<String, Object> d = chestDefs.get(key);
+            if (d != null) return (String) d.get("sprite");
         }
         return null;
     }
 
-    /** Expose to others who need to know tile size. */
-    public double getCellWidth()  { return cellW; }
-    public double getCellHeight() { return cellH; }
+    /**
+     * Expose to others who need to know tile size.
+     */
+    public double getCellWidth() {
+        return cellW;
+    }
+
+    public double getCellHeight() {
+        return cellH;
+    }
 }

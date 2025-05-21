@@ -55,7 +55,7 @@ public class InteractionService {
             double ny = (oy - cy) / cellH;
             double distSq = nx*nx + ny*ny;
 
-            if (distSq <= bestDistSq && !obj.hasInteracted()) {
+            if (distSq <= bestDistSq ) {
                 bestDistSq = distSq;
                 nearest    = obj;
             }

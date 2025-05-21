@@ -17,7 +17,6 @@ public class Obstacle extends MapObject {
 
     @Override
     public void onInteract(RoomController controller) {
-
     }
 
     public void setSprite(String sprite) {

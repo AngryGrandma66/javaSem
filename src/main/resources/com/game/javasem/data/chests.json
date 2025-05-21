@@ -1,0 +1,36 @@
+{
+  "goldChest": {
+    "sprite": "goldChest.png",
+    "lootPool": [
+      "excalibur",
+      "runeSword",
+      "magicBlade",
+      "lightningRing",
+      "fireAmulet",
+      "icePendant",
+      "goldenArmor"
+    ]
+  },
+
+  "silverChest": {
+    "sprite": "silverChest.png",
+    "lootPool": [
+      "runeSword",
+      "magicBlade",
+      "silverBracelet",
+      "ironDagger",
+      "silverArmor"
+    ]
+  },
+
+  "bronzeChest": {
+    "sprite": "bronzeChest.png",
+    "lootPool": [
+      "ironDagger",
+      "leatherArmor",
+      "bronzeArmor",
+      "key"
+    ]
+  }
+}
+

@@ -39,8 +39,7 @@ public class MainMenuController {
             // 3) Initialize your map & controller
 
             rc.setDungeonMap(dungeon);
-            rc.initialize(gameScene);
-            rc.setRoom(dungeon.getStartRoom());
+            rc.initialize();
             // bind key‐handlers
             rc.setScene(gameScene);
             // show the central starting room

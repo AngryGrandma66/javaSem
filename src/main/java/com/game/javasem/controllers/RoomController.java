@@ -1,71 +1,54 @@
 package com.game.javasem.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.game.javasem.model.map.DungeonMap;
 import com.game.javasem.model.map.Room;
-import com.game.javasem.model.mapObjects.*;
-import javafx.animation.AnimationTimer;
+import com.game.javasem.model.mapObjects.Door;
+import com.game.javasem.model.mapObjects.Item;
+import com.game.javasem.model.mapObjects.MapObject;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.BoundingBox;
-import javafx.geometry.Bounds;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class RoomController {
-    private static final double TILE_RADIUS = 1.2;
     @FXML
     private ImageView mapView;
     @FXML
     private ImageView character;
     @FXML
     private Pane tileLayer;
+    @FXML
+    private AnchorPane roomPane;
+    @FXML
+    private StackPane mapPane;    // collaborators—each in its own class:
+    private RoomRenderer renderer;
+    private MovementController movement;
+    private InteractionService interaction;
+    private MapController mapController;
 
-    @FXML private AnchorPane   roomPane;
-    @FXML private StackPane mapPane;
-    private MapController      mapController;
-
-    private Stage mapStage;
-    private Scene scene;          // ← store the scene here
     private DungeonMap dungeonMap;
     private Room currentRoom;
-    private double SPEED = 500;
-    private boolean movingUp, movingDown, movingLeft, movingRight;
-    private AnimationTimer timer;
-    private long lastTime;
-    private boolean firstShow = true;   // track that we’ve never shown a room yet
-    private int rows;
-    private int cols;
-    private double cellW;
-    private double cellH;
-
-
+    private boolean firstShow = true;
     private Map<String, Map<String, Object>> obstacleDefs;
     private Map<String, Map<String, Object>> itemDefs;
     private Map<String, Map<String, Object>> enemyDefs;
     private Map<String, Map<String, Object>> doorDefs;
+    private double cellW, cellH;
 
-    private List<List<MapObject>> layout;
 
-    public void initialize(Scene scene) {
+    @FXML
+    public void initialize() {
+        // 1) load the map‐overview FXML and grab its controller
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/game/javasem/fxml/MapView.fxml")
@@ -73,66 +56,165 @@ public class RoomController {
             Parent mapRoot = loader.load();
             mapController = loader.getController();
             mapPane.getChildren().add(mapRoot);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+        loadDefinitions();
+        // 2) initially hide the map overlay
         mapPane.setVisible(false);
         mapPane.setManaged(false);
-        loadDefinitions();
-        bindKeys(scene);
-        timer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                if (lastTime == 0) {
-                    lastTime = now;
-                    return;
-                }
-                double delta = (now - lastTime) / 1e9;
-                lastTime = now;
-                double dx = (movingRight ? SPEED : 0) - (movingLeft ? SPEED : 0);
-                double dy = (movingDown ? SPEED : 0) - (movingUp ? SPEED : 0);
-                moveWithCollision(dx * delta, dy * delta);
-                logNearbyInteractable();
+
+        // 3) instantiate your four helper classes
+        renderer = new RoomRenderer(tileLayer, mapView, obstacleDefs, itemDefs, enemyDefs, doorDefs);
+        movement = new MovementController(character, tileLayer);
+        interaction = new InteractionService(tileLayer);
+
+// after renderer.render(room):
+        interaction.updateCellSize(renderer.getCellWidth(), renderer.getCellHeight());
+        cellH = interaction.getCellH();
+        cellW = interaction.getCellW();
+
+        movement.start();
+    }
+
+    private void bindKeys(Scene s) {
+        s.setOnKeyPressed(e -> {
+            switch (e.getCode()) {
+                case M -> toggleMap();
+                case UP, W -> movement.setMovingUp(true);
+                case DOWN, S -> movement.setMovingDown(true);
+                case LEFT, A -> movement.setMovingLeft(true);
+                case RIGHT, D -> movement.setMovingRight(true);
+                case E -> interaction.handleInteraction(character, this);
             }
-        };
-        timer.start();
+        });
+        s.setOnKeyReleased(e -> {
+            switch (e.getCode()) {
+                case UP, W -> movement.setMovingUp(false);
+                case DOWN, S -> movement.setMovingDown(false);
+                case LEFT, A -> movement.setMovingLeft(false);
+                case RIGHT, D -> movement.setMovingRight(false);
+            }
+        });
     }
-    private void centerCharacter() {
-        double viewW = mapView.getFitWidth();
-        double viewH = mapView.getFitHeight();
-        double charW = character.getBoundsInLocal().getWidth();
-        double charH = character.getBoundsInLocal().getHeight();
 
-        double x = (viewW - charW) / 2;
-        double y = (viewH - charH) / 2;
-
-        character.setLayoutX(x);
-        character.setLayoutY(y);
-    }
+    /**
+     * Called by your App/MainMenu to hand over a new dungeon.
+     */
     public void setDungeonMap(DungeonMap dungeonMap) {
         this.dungeonMap = dungeonMap;
     }
 
+    /**
+     * Hook up key handling (including M → toggle map).
+     */
     public void setScene(Scene scene) {
-        this.scene = scene;
-        bindKeys(scene);             // bind your key‐handling here
+        bindKeys(scene);
+
     }
 
     /**
-     * called from MainMenuController
+     * Display a specific room.
+     * Stops movement, renders, centers player once, then resumes.
      */
     public void showRoom(Room room) {
         this.currentRoom = room;
-        List<List<MapObject>> raw = room.getLayout();
-        if (raw == null || raw.isEmpty()) {
-            System.err.println("Room has no layout!");
+
+        // pause movement while we swap rooms
+        movement.stop();
+
+        // draw the new room
+        renderer.render(room);
+        interaction.updateCellSize(renderer.getCellWidth(), renderer.getCellHeight());
+        cellH = interaction.getCellH();
+        cellW = interaction.getCellW();
+
+        // clear any pending input & resume
+        if (firstShow) {
+            movement.centerCharacter();
+            firstShow = false;
+        }
+        movement.reset();
+        movement.start();
+
+    }
+
+    public void changeRoom(Door usedDoor) {
+        String dir = usedDoor.getDirection();
+        int idx = currentRoom.getIndex();
+        int sz = dungeonMap.getGridSize();
+        int newIdx = switch (dir) {
+            case "U" -> idx >= sz ? idx - sz : -1;
+            case "D" -> idx < sz * (sz - 1) ? idx + sz : -1;
+            case "L" -> idx % sz != 0 ? idx - 1 : -1;
+            case "R" -> idx % sz != sz - 1 ? idx + 1 : -1;
+            default -> -1;
+        };
+        if (newIdx < 0) return;
+
+        Room next = dungeonMap.getRooms()[newIdx];
+        if (!next.exists()) return;
+
+        movement.stop();
+        showRoom(next);
+
+        String opposite = switch (dir) {
+            case "U" -> "D";
+            case "D" -> "U";
+            case "L" -> "R";
+            case "R" -> "L";
+            default -> throw new IllegalArgumentException(dir);
+        };
+
+        // find the entry‐door via a labeled break
+        Door entry = null;
+        outer:
+        for (int r = 0; r < next.getLayout().size(); r++) {
+            for (int c = 0; c < next.getLayout().get(r).size(); c++) {
+                MapObject mo = next.getLayout().get(r).get(c);
+                if (mo instanceof Door d && opposite.equals(d.getDirection())) {
+                    entry = d;
+                    break outer;
+                }
+            }
+        }
+        if (entry == null) {
+            System.err.println("No opposite door found in " + opposite);
+            movement.start();
             return;
         }
-        renderRoom();            // your existing render logic
-        if (firstShow) {
-            firstShow = false;
-            centerCharacter();
+
+        // drop the player just outside that door
+        movement.placeAtDoor(entry, cellW, cellH, 2);
+        movement.start();
+    }
+
+    public void pickupItem(Item item) {
+        // update your model
+        interaction.removeTileAt(currentRoom, item);
+        System.out.println("Picked up " + item.getType());
+    }
+
+    /**
+     * Flip between the room‐view and the full‐map overlay.
+     */
+    private void toggleMap() {
+        boolean showing = mapPane.isVisible();
+        mapPane.setVisible(!showing);
+        mapPane.setManaged(!showing);
+        if (!showing) {
+            // turning ON the map overlay
+            movement.stop();
+            mapController.showMap(dungeonMap, currentRoom.getIndex());
+            mapPane.toFront();
+        } else {
+            mapPane.toBack();
+
+            // turning OFF the map overlay
+            movement.reset();
+            movement.start();
         }
+
     }
 
     private void loadDefinitions() {
@@ -163,296 +245,5 @@ public class RoomController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public void setRoom(Room room) {
-        this.currentRoom = room;
-    }
-
-    private void renderRoom() {
-        System.out.println(currentRoom.getIndex());
-        System.out.println(currentRoom.getLayoutFlags());
-        tileLayer.getChildren().clear();
-
-        layout = currentRoom.getLayout();
-        rows = layout.size();
-        cols = layout.getFirst().size();
-        cellW = mapView.getFitWidth() / cols;
-        cellH = mapView.getFitHeight() / rows;
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
-                MapObject obj = layout.get(r).get(c);
-                if (obj == null) continue;
-                if (obj instanceof Door door && doorDefs != null) {
-                    Map<String, Object> def = doorDefs.get(door.getSprite());
-                    if (def != null) {
-                        door.setDirection((String) def.get("direction"));
-                        door.setPosition(r, c);
-                    }
-                }
-                String sprite = getSpriteFor(obj);// your MapObject subclasses return the correct sprite URL
-                if (sprite == null) continue;
-                ImageView iv = new ImageView(new Image(Objects.requireNonNull(getClass().getResource(
-                        "/com/game/javasem/images/" + sprite)).toExternalForm()));
-                iv.setFitWidth(cellW);
-                iv.setFitHeight(cellH);
-                iv.setLayoutX(c * cellW);
-                iv.setLayoutY(r * cellH);
-                iv.setUserData(obj);
-                tileLayer.getChildren().add(iv);
-            }
-        }
-    }
-
-    private String getSpriteFor(MapObject obj) {
-        String key;
-        if (obj instanceof Obstacle && obstacleDefs != null) {
-            key = obj.getSprite();
-            Map<String, Object> def = obstacleDefs.get(key);
-            if (def != null) return (String) def.get("sprite");
-        } else if (obj instanceof Item && itemDefs != null) {
-            key = obj.getType();
-            Map<String, Object> def = itemDefs.get(key);
-            if (def != null) return (String) def.get("sprite");
-        } else if (obj instanceof Enemy && enemyDefs != null) {
-            key = obj.getType();
-            Map<String, Object> def = enemyDefs.get(key);
-            if (def != null) return (String) def.get("sprite");
-        } else if (obj instanceof Door && enemyDefs != null) {
-            key = obj.getSprite();
-            Map<String, Object> def = doorDefs.get(key);
-            if (def != null) return (String) def.get("sprite");
-        }
-        return null;
-    }
-
-    private void bindKeys(Scene s) {
-        s.setOnKeyPressed(e -> {
-            switch (e.getCode()) {
-                case M -> {
-                    toggleMap();
-                    //e.consume();
-                }
-                case UP, W    -> movingUp    = true;
-                case DOWN, S  -> movingDown  = true;
-                case LEFT, A  -> movingLeft  = true;
-                case RIGHT, D -> movingRight = true;
-                case E        -> handleInteraction();
-            }
-        });
-        s.setOnKeyReleased(e -> {
-            switch (e.getCode()) {
-                case UP, W    -> movingUp    = false;
-                case DOWN, S  -> movingDown  = false;
-                case LEFT, A  -> movingLeft  = false;
-                case RIGHT, D -> movingRight = false;
-            }
-        });
-    }
-    private void toggleMap() {
-        boolean showing = mapPane.isVisible();
-
-        // flip the map overlay
-        mapPane.setVisible(!showing);
-        mapPane.setManaged(!showing);
-
-        if (!showing) {
-            // --- map just turned ON ---
-            // pause movement
-            timer.stop();
-            movingUp = movingDown = movingLeft = movingRight = false;
-
-            // draw the map
-            mapController.showMap(dungeonMap, currentRoom.getIndex());
-            mapPane.toFront();
-        } else {
-            // --- map just turned OFF ---
-            mapPane.toBack();
-
-            // resume movement
-            lastTime = 0;    // reset so we don't get a big jump
-            timer.start();
-        }
-    }
-    private void moveWithCollision(double dx, double dy) {
-        double newX = character.getLayoutX() + dx;
-        character.setLayoutX(newX);
-        if (collides()) character.setLayoutX(character.getLayoutX() - dx);
-
-        double newY = character.getLayoutY() + dy;
-        character.setLayoutY(newY);
-        if (collides()) character.setLayoutY(character.getLayoutY() - dy);
-    }
-
-    private void handleInteraction() {
-        System.out.println("[DEBUG] Interaction key pressed.");
-        MapObject obj = findNearbyObject();
-        if (obj != null) {
-            System.out.println("[DEBUG] Interacting with: " + obj.getClass().getSimpleName());
-            obj.onInteract(this);
-        } else {
-            System.out.println("[DEBUG] No interactable object nearby.");
-        }
-    }
-
-    private MapObject findNearbyObject() {
-        // character center
-        Bounds cb = character.getBoundsInParent();
-        double cx = cb.getMinX() + cb.getWidth() / 2;
-        double cy = cb.getMinY() + cb.getHeight() / 2;
-
-        MapObject nearest = null;
-        double bestNormDistSq = TILE_RADIUS * TILE_RADIUS;
-
-        for (Node node : tileLayer.getChildren()) {
-            if (!(node instanceof ImageView) || !(node.getUserData() instanceof MapObject))
-                continue;
-
-            Bounds ob = node.getBoundsInParent();
-            double ox = ob.getMinX() + ob.getWidth() / 2;
-            double oy = ob.getMinY() + ob.getHeight() / 2;
-
-            double dx = ox - cx, dy = oy - cy;
-            // normalize by tile size
-            double nx = dx / cellW;
-            double ny = dy / cellH;
-            double normDistSq = nx * nx + ny * ny;
-
-            if (normDistSq <= bestNormDistSq) {
-                MapObject obj = (MapObject) node.getUserData();
-                if (!obj.hasInteracted()) {
-                    bestNormDistSq = normDistSq;
-                    nearest = obj;
-                }
-            }
-        }
-        return nearest;
-    }
-
-    private void logNearbyInteractable() {
-        MapObject obj = findNearbyObject();
-        if (obj != null) {
-            //System.out.println("[DEBUG] Nearby: " + obj.getClass().getSimpleName());
-        }
-    }
-
-    private boolean collides() {
-        for (Node t : tileLayer.getChildren()) {
-            if (character.getBoundsInParent().intersects(t.getBoundsInParent())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void pickupItem(Item item) {
-        System.out.println("Picked up: " + item.getType());
-        removeTileAt(item);
-    }
-
-    public void removeTileAt(MapObject obj) {
-        for (int r = 0; r < layout.size(); r++) {
-            for (int c = 0; c < layout.get(r).size(); c++) {
-                if (layout.get(r).get(c) == obj) {
-                    layout.get(r).set(c, null);
-                    double x = c * cellW;
-                    double y = r * cellH;
-                    tileLayer.getChildren().removeIf(n -> n.getLayoutX() == x &&
-                            n.getLayoutY() == y);
-                    return;
-                }
-            }
-        }
-    }
-
-    public void changeRoom(Door usedDoor) {
-        String dir = usedDoor.getDirection();
-        int idx = currentRoom.getIndex();
-        int size = dungeonMap.getGridSize();
-        System.out.println("→ Travelling " + dir + " from room idx=" + idx);
-
-        int newIdx = switch (dir) {
-            case "U" -> idx >= size ? idx - size : -1;
-            case "D" -> idx < size * (size - 1) ? idx + size : -1;
-            case "L" -> idx % size != 0 ? idx - 1 : -1;
-            case "R" -> idx % size != size - 1 ? idx + 1 : -1;
-            default -> -1;
-        };
-        System.out.println("   computed newIdx=" + newIdx);
-        if (newIdx < 0) return;
-
-        timer.stop();
-        movingUp = movingDown = movingLeft = movingRight = false;
-        Room next = dungeonMap.getRooms()[newIdx];
-        System.out.println("   exists? " + next.exists());
-        if (!next.exists()) return;
-
-        // render the new room
-        showRoom(next);
-
-        // find the door in the new room that has the opposite direction
-        String opposite = switch (dir) {
-            case "U" -> "D";
-            case "D" -> "U";
-            case "L" -> "R";
-            case "R" -> "L";
-            default -> null;
-        };
-
-        Door entry = null;
-        int entryRow = -1, entryCol = -1;
-        for (int r = 0; r < next.getLayout().size(); r++) {
-            for (int c = 0; c < next.getLayout().get(r).size(); c++) {
-                MapObject mo = next.getLayout().get(r).get(c);
-                if (mo instanceof Door d && opposite.equals(d.getDirection())) {
-                    entry = d;
-                    entryRow = r;
-                    entryCol = c;
-                    System.out.println("   found entry door at tile (" + r + "," + c + ")");
-                    break;
-                }
-            }
-            if (entry != null) break;
-        }
-        if (entry == null) {
-            System.err.println("   ! no matching opposite door");
-            return;
-        }
-
-        // compute character size and gap
-        double charW = character.getBoundsInLocal().getWidth();
-        double charH = character.getBoundsInLocal().getHeight();
-        double gap = 2;
-
-        // now choose spawnX/spawnY so we're just outside the door tile
-        double spawnX = 0, spawnY = 0;
-        switch (opposite) {
-            case "U" -> {
-                // door at top row (row=0), spawn just below
-                spawnX = entryCol * cellW + (cellW - charW) * 0.5;
-                spawnY = entryRow * cellH + cellH + gap;
-            }
-            case "D" -> {
-                // door at bottom row, spawn just above
-                spawnX = entryCol * cellW + (cellW - charW) * 0.5;
-                spawnY = entryRow * cellH - charH - gap;
-            }
-            case "L" -> {
-                // door at leftmost col, spawn just to the right
-                spawnX = entryCol * cellW + cellW + gap;
-                spawnY = entryRow * cellH + (cellH - charH) * 0.5;
-            }
-            case "R" -> {
-                // door at rightmost col, spawn just to the left
-                spawnX = entryCol * cellW - charW - gap;
-                spawnY = entryRow * cellH + (cellH - charH) * 0.5;
-            }
-        }
-
-        System.out.println(String.format("   placing character at px(%.1f,%.1f)", spawnX, spawnY));
-        character.setLayoutX(spawnX);
-        character.setLayoutY(spawnY);
-        lastTime = 0;     // so first tick doesn't carry an old timestamp
-        timer.start();
     }
 }

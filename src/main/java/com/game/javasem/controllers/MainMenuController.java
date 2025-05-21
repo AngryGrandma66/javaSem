@@ -28,7 +28,8 @@ public class MainMenuController {
                     getClass().getResource("/com/game/javasem/fxml/Room.fxml")
             );
             Parent gameRoot = loader.load();
-
+            DungeonMap dungeon = new DungeonMap(/*gridSize=*/10, /*min=*/12, /*max=*/20);
+            RoomController rc = loader.getController();
             // 2) Swap scenes on the same stage
             Stage stage = (Stage)newGameButton.getScene().getWindow();
             Scene gameScene = new Scene(gameRoot);
@@ -36,8 +37,7 @@ public class MainMenuController {
             stage.setTitle("Dungeon Explorer");
 
             // 3) Initialize your map & controller
-            DungeonMap dungeon = new DungeonMap(/*gridSize=*/10, /*min=*/12, /*max=*/20);
-            RoomController rc = loader.getController();
+
             rc.setDungeonMap(dungeon);
             rc.initialize(gameScene);
             rc.setRoom(dungeon.getStartRoom());

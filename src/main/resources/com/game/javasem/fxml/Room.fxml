@@ -25,7 +25,6 @@
 
             <!-- Character sprite -->
             <ImageView fx:id="character"
-                       layoutX="400" layoutY="300"
                        fitWidth="40" fitHeight="40">
                 <Image url="@../images/character.png"/>
             </ImageView>

@@ -51,7 +51,7 @@ public class RoomController {
     private boolean movingUp, movingDown, movingLeft, movingRight;
     private AnimationTimer timer;
     private long lastTime;
-
+    private boolean firstShow = true;   // track that we’ve never shown a room yet
     private int rows;
     private int cols;
     private double cellW;
@@ -97,7 +97,18 @@ public class RoomController {
         };
         timer.start();
     }
+    private void centerCharacter() {
+        double viewW = mapView.getFitWidth();
+        double viewH = mapView.getFitHeight();
+        double charW = character.getBoundsInLocal().getWidth();
+        double charH = character.getBoundsInLocal().getHeight();
 
+        double x = (viewW - charW) / 2;
+        double y = (viewH - charH) / 2;
+
+        character.setLayoutX(x);
+        character.setLayoutY(y);
+    }
     public void setDungeonMap(DungeonMap dungeonMap) {
         this.dungeonMap = dungeonMap;
     }
@@ -118,6 +129,10 @@ public class RoomController {
             return;
         }
         renderRoom();            // your existing render logic
+        if (firstShow) {
+            firstShow = false;
+            centerCharacter();
+        }
     }
 
     private void loadDefinitions() {
@@ -152,7 +167,6 @@ public class RoomController {
 
     public void setRoom(Room room) {
         this.currentRoom = room;
-        renderRoom();
     }
 
     private void renderRoom() {
@@ -374,7 +388,7 @@ public class RoomController {
         if (!next.exists()) return;
 
         // render the new room
-        setRoom(next);
+        showRoom(next);
 
         // find the door in the new room that has the opposite direction
         String opposite = switch (dir) {

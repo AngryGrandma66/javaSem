@@ -17,11 +17,6 @@ public class App extends Application {
         stage.setTitle("JavaFX Map Movement Example");
         stage.setScene(scene);
         stage.show();
-        // Pass scene to controller to capture key presses
-       // RoomController controller = fxmlLoader.getController();
-        // controller.initialize(scene);
-
-
     }
 
     public static void main(String[] args) {

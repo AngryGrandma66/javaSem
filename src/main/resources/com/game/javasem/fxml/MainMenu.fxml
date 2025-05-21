@@ -15,5 +15,5 @@
 
     <Button text="New Game" fx:id="newGameButton" onAction="#handleNewGame"/>
     <Button text="Load Game" fx:id="loadGameButton" onAction="#handleLoadGame"/>
-
+    <Button text="Enable Debug Logs" fx:id="logButton" onAction="#handleToggleLogging"/>
 </VBox>

@@ -6,6 +6,8 @@ import com.game.javasem.model.mapObjects.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -13,17 +15,17 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class RoomRenderer {
+    private static final Logger log = LoggerFactory.getLogger(RoomRenderer.class);
+
     private final Pane tileLayer;
     private final ImageView mapView;
 
-    // all your JSON‐loaded lookup tables:
     private final Map<String, Map<String, Object>> obstacleDefs;
     private final Map<String, Map<String, Object>> itemDefs;
     private final Map<String, Map<String, Object>> enemyDefs;
     private final Map<String, Map<String, Object>> doorDefs;
-    private Map<String, Map<String, Object>> chestDefs;
+    private final Map<String, Map<String, Object>> chestDefs;
 
-    // most recent cell size, for anyone else who needs it:
     private double cellW, cellH;
 
     public RoomRenderer(Pane tileLayer,
@@ -33,19 +35,19 @@ public class RoomRenderer {
                         Map<String, Map<String, Object>> enemyDefs,
                         Map<String, Map<String, Object>> doorDefs,
                         Map<String, Map<String, Object>> chestDefs) {
-        this.tileLayer = tileLayer;
-        this.mapView = mapView;
+        this.tileLayer    = tileLayer;
+        this.mapView      = mapView;
         this.obstacleDefs = obstacleDefs;
-        this.itemDefs = itemDefs;
-        this.enemyDefs = enemyDefs;
-        this.doorDefs = doorDefs;
-        this.chestDefs = chestDefs;
+        this.itemDefs     = itemDefs;
+        this.enemyDefs    = enemyDefs;
+        this.doorDefs     = doorDefs;
+        this.chestDefs    = chestDefs;
+        log.debug("RoomRenderer initialized");
     }
 
-    /**
-     * Draws the given Room onto the tileLayer, replacing whatever was there.
-     */
     public void render(Room room) {
+        log.info("Rendering room #{} ({} x {})", room.getIndex(),
+                room.getLayout().size(), room.getLayout().get(0).size());
         tileLayer.getChildren().clear();
 
         List<List<MapObject>> layout = room.getLayout();
@@ -53,20 +55,24 @@ public class RoomRenderer {
 
         cellW = mapView.getFitWidth() / cols;
         cellH = mapView.getFitHeight() / rows;
+        log.debug("Cell size set to {} x {}", cellW, cellH);
 
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 MapObject obj = layout.get(r).get(c);
                 if (obj == null) continue;
 
-                // if it’s a Door, pull direction from doorDefs
                 if (obj instanceof Door door) {
                     Map<String, Object> def = doorDefs.get(door.getSprite());
                     if (def != null) {
                         door.setDirection((String) def.get("direction"));
                         door.setPosition(r, c);
+                        log.trace("Placed door '{}' at {},{}", door.getSprite(), r, c);
+                    } else {
+                        log.warn("No door definition for '{}'", door.getSprite());
                     }
                 }
+
                 if (obj instanceof Enemy e) {
                     Map<String,Object> def = enemyDefs.get(e.getType());
                     if (def != null) {
@@ -75,28 +81,37 @@ public class RoomRenderer {
                         e.setHealth(hp);
                         e.setCurrentHealth(hp);
                         @SuppressWarnings("unchecked")
-                        List<Map<String,Object>> atks = (List<Map<String,Object>>)def.get("attacks");
+                        List<Map<String,Object>> atks = (List<Map<String,Object>>) def.get("attacks");
                         List<Attack> atkList = atks.stream().map(m ->
                                 new Attack(
-                                        (String)m.get("name"),
-                                        ((Number)m.get("damage")).intValue(),
-                                        ((Number)m.get("cooldown")).intValue()
+                                        (String)    m.get("name"),
+                                        ((Number)   m.get("damage")).intValue(),
+                                        ((Number)   m.get("cooldown")).intValue()
                                 )
                         ).collect(Collectors.toList());
                         e.setAttacks(atkList);
                         @SuppressWarnings("unchecked")
-                        List<String> loot = (List<String>)def.get("lootPool");
+                        List<String> loot = (List<String>) def.get("lootPool");
                         e.setLootPool(loot);
-                        e.setBoss((Boolean)def.get("boss"));
+                        e.setBoss((Boolean) def.get("boss"));
+                        log.trace("Configured enemy '{}' with {} HP, {} attacks",
+                                e.getType(), hp, atkList.size());
+                    } else {
+                        log.warn("No enemy definition for type '{}'", e.getType());
                     }
                 }
+
                 String sprite = spriteFor(obj);
-                if (sprite == null) continue;
+                if (sprite == null) {
+                    log.debug("No sprite found for object {}", obj);
+                    continue;
+                }
 
                 ImageView iv = new ImageView(
                         new Image(
                                 Objects.requireNonNull(
-                                        getClass().getResource("/com/game/javasem/images/" + sprite)
+                                        getClass().getResource("/com/game/javasem/images/" + sprite),
+                                        "Missing image resource: " + sprite
                                 ).toExternalForm()
                         )
                 );
@@ -108,41 +123,49 @@ public class RoomRenderer {
                 tileLayer.getChildren().add(iv);
             }
         }
+        log.info("Finished rendering room #{}", room.getIndex());
     }
 
     private String spriteFor(MapObject obj) {
-        String key;
+        String key, sprite;
         if (obj instanceof Obstacle && obstacleDefs != null) {
             key = obj.getSprite();
-            Map<String, Object> d = obstacleDefs.get(key);
-            if (d != null) return (String) d.get("sprite");
+            sprite = getDefSprite(obstacleDefs, key, "obstacle");
+            if (sprite != null) return sprite;
         }
         if (obj instanceof Item && itemDefs != null) {
             key = obj.getType();
-            Map<String, Object> d = itemDefs.get(key);
-            if (d != null) return (String) d.get("sprite");
+            sprite = getDefSprite(itemDefs, key, "item");
+            if (sprite != null) return sprite;
         }
         if (obj instanceof Enemy && enemyDefs != null) {
             key = obj.getType();
-            Map<String, Object> d = enemyDefs.get(key);
-            if (d != null) return (String) d.get("sprite");
+            sprite = getDefSprite(enemyDefs, key, "enemy");
+            if (sprite != null) return sprite;
         }
         if (obj instanceof Door && doorDefs != null) {
             key = obj.getSprite();
-            Map<String, Object> d = doorDefs.get(key);
-            if (d != null) return (String) d.get("sprite");
+            sprite = getDefSprite(doorDefs, key, "door");
+            if (sprite != null) return sprite;
         }
         if (obj instanceof Chest && chestDefs != null) {
             key = obj.getSprite();
-            Map<String, Object> d = chestDefs.get(key);
-            if (d != null) return (String) d.get("sprite");
+            sprite = getDefSprite(chestDefs, key, "chest");
+            return sprite;
         }
         return null;
     }
 
-    /**
-     * Expose to others who need to know tile size.
-     */
+    private String getDefSprite(Map<String, Map<String,Object>> defs,
+                                String key, String category) {
+        Map<String, Object> d = defs.get(key);
+        if (d == null) {
+            log.warn("No {} definition for key '{}'", category, key);
+            return null;
+        }
+        return (String) d.get("sprite");
+    }
+
     public double getCellWidth() {
         return cellW;
     }

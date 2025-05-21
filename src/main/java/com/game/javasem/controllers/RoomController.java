@@ -13,7 +13,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -25,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RoomController {
     @FXML
@@ -38,10 +39,11 @@ public class RoomController {
     @FXML
     private AnchorPane roomPane;
     @FXML
-    private StackPane mapPane;    // collaborators—each in its own class:
+    private StackPane mapPane;
     private RoomRenderer renderer;
     private MovementController movement;
     private InteractionService interaction;
+    private static final Logger log = LoggerFactory.getLogger(RoomController.class);
 
     private MapController mapController;
     private InventoryController inventoryController;
@@ -71,8 +73,8 @@ public class RoomController {
 
     @FXML
     public void initialize() {
-        // 1) load the map‐overview FXML and grab its controller
         try {
+            log.info("Initializing RoomController and loading overlays");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/game/javasem/fxml/MapView.fxml"));
             Parent mapRoot = loader.load();
             mapController = loader.getController();
@@ -83,22 +85,20 @@ public class RoomController {
             inventoryPane.getChildren().add(invRoot);
             inventoryController = invLoader.getController();
         } catch (Exception e) {
+            log.error("Failed to load map/inventory overlays", e);
             throw new RuntimeException(e);
         }
         loadDefinitions();
-        // 2) initially hide the map overlay
         mapPane.setVisible(false);
         mapPane.setManaged(false);
         inventoryPane.setVisible(false);
         inventoryPane.setManaged(false);
 
-        // 3) instantiate your four helper classes
         renderer = new RoomRenderer(tileLayer, mapView, obstacleDefs, itemDefs, enemyDefs, doorDefs, chestDefs);
         movement = new MovementController(character, tileLayer);
         interaction = new InteractionService(tileLayer);
 
         inventoryController.setPlayer(this.player);
-// after renderer.render(room):
         interaction.updateCellSize(renderer.getCellWidth(), renderer.getCellHeight());
         cellH = interaction.getCellH();
         cellW = interaction.getCellW();
@@ -106,18 +106,10 @@ public class RoomController {
         movement.start();
     }
 
-    public double getCharLayoutX() {
-        return character.getLayoutX();
-    }
-
-    public double getCharLayoutY() {
-        return character.getLayoutY();
-    }
-
     private void bindKeys(Scene s) {
         s.setOnKeyPressed(e -> {
             switch (e.getCode()) {
-                case ESCAPE -> showPauseMenu();
+                case ESCAPE -> { log.debug("ESC pressed: showing pause menu"); showPauseMenu(); }
                 case I -> toggleInventory();
                 case M -> toggleMap();
                 case UP, W -> movement.setMovingUp(true);
@@ -163,47 +155,40 @@ public class RoomController {
         }
     }
 
-    /**
-     * Called by your App/MainMenu to hand over a new dungeon.
-     */
     public void setDungeonMap(DungeonMap dungeonMap) {
         this.dungeonMap = dungeonMap;
+        log.info("DungeonMap injected with {} rooms", dungeonMap.getRooms().length);
     }
 
-    /**
-     * Hook up key handling (including M → toggle map).
-     */
+
     public void setScene(Scene scene) {
         this.roomScene = scene;
         this.primaryStage = (Stage) scene.getWindow();
         bindKeys(scene);
+        log.debug("Key bindings attached to scene");
 
     }
 
     public void setPlayer(Player p) {
         this.player = p;
+        log.info("Player injected: {}", p);
     }
 
-    /**
-     * Display a specific room.
-     * Stops movement, renders, centers player once, then resumes.
-     */
-    public void showRoom(Room room) {
-       this.currentRoom = room;
 
-        // pause movement while we swap rooms
+    public void showRoom(Room room) {
+        this.currentRoom = room;
+        log.info("Showing room index {}", room.getIndex());
         movement.stop();
 
-        // draw the new room
         renderer.render(room);
         interaction.updateCellSize(renderer.getCellWidth(), renderer.getCellHeight());
         cellH = interaction.getCellH();
         cellW = interaction.getCellW();
 
-        // clear any pending input & resume
         if (firstShow) {
             movement.centerCharacter();
             firstShow = false;
+            log.debug("Centered character on first show");
         }
         movement.reset();
         movement.start();
@@ -211,6 +196,7 @@ public class RoomController {
     }
 
     public void changeRoom(Door usedDoor) {
+        log.info("Interacting with door at ({}, {}) direction {}", usedDoor.getRow(), usedDoor.getCol(), usedDoor.getDirection());
         String dir = usedDoor.getDirection();
         int idx = currentRoom.getIndex();
         int sz = dungeonMap.getGridSize();
@@ -237,7 +223,6 @@ public class RoomController {
             default -> throw new IllegalArgumentException(dir);
         };
 
-        // find the entry‐door via a labeled break
         Door entry = null;
         for (int r = 0; r < next.getLayout().size(); r++) {
             for (int c = 0; c < next.getLayout().get(r).size(); c++) {
@@ -249,46 +234,39 @@ public class RoomController {
             }
         }
         if (entry == null) {
-            System.err.println("No opposite door found in " + opposite);
             movement.start();
             return;
         }
 
-        // drop the player just outside that door
         movement.placeAtDoor(entry, cellW, cellH, 2);
         movement.start();
     }
 
     public void pickupItem(Item item) {
-        // update your model
-
+        log.info("Picked up item {}", item.getType());
         GameItem gameItem = gameItemDefs.get(item.getType());
         if (gameItem != null) {
             player.getInventory().addItem(gameItem);
-            System.out.println(player.getInventory().toString());
         }
         interaction.removeTileAt(currentRoom, item);
-        System.out.println("Picked up " + item.getType());
     }
 
     public void openChest(Chest chest) {
-        // require a key to open
+        log.info("Attempting to open chest {}", chest.getSprite());
         GameItem keyItem = gameItemDefs.get("key");
         if (keyItem == null || !player.getInventory().getItems().contains(keyItem)) {
-            System.out.println("You need a key to open this chest!");
+            log.warn("No key in inventory, cannot open chest");
             return;
         }
-        // remove one key from inventory
         player.getInventory().removeItem(keyItem);
-
-        // lookup loot pool
+        log.debug("Key consumed");
         @SuppressWarnings("unchecked") List<String> pool = (List<String>) chestDefs.get(chest.getSprite()).get("lootPool");
         if (pool != null && !pool.isEmpty()) {
             String lootId = pool.get(new Random().nextInt(pool.size()));
             GameItem loot = gameItemDefs.get(lootId);
             if (loot != null) {
                 player.getInventory().addItem(loot);
-                System.out.println("You found " + loot.getName() + "!");
+                log.info("Chest yielded {}", lootId);
             }
         }
         interaction.removeTileAt(currentRoom, chest);
@@ -296,6 +274,8 @@ public class RoomController {
 
     public void fightEnemy(Enemy enemy) {
         try {
+            log.info("Starting battle with {} at room {}", enemy.getType(), currentRoom.getIndex());
+            movement.stop();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/game/javasem/fxml/BattleView.fxml"));
             Parent battleRoot = loader.load();
             BattleController bc = loader.getController();
@@ -309,19 +289,18 @@ public class RoomController {
         }
     }
 
-    /**
-     * Handle end of battle: award loot and transition.
-     */
+
     public void handleBattleEnd(Enemy enemy) {
+        log.info("Battle ended. Boss? {}. Awarding loot.", enemy.isBoss());
         List<String> pool = enemy.getLootPool();
         interaction.removeTileAt(currentRoom, enemy);
+        movement.reset();
+        movement.start();
         if (pool != null && !pool.isEmpty()) {
             String lootId = pool.get(new Random().nextInt(pool.size()));
             if (gameItemDefs != null && gameItemDefs.containsKey(lootId)) {
                 GameItem loot = gameItemDefs.get(lootId);
                 player.getInventory().addItem(loot);
-            } else {
-                System.err.println("No GameItem definition for loot ID: " + lootId);
             }
         }
 
@@ -339,46 +318,41 @@ public class RoomController {
         }
     }
 
-    /**
-     * Flip between the room‐view and the full‐map overlay.
-     */
+
     private void toggleMap() {
         boolean showing = mapPane.isVisible();
         mapPane.setVisible(!showing);
         mapPane.setManaged(!showing);
         if (!showing) {
-            // turning ON the map overlay
             movement.stop();
             mapController.showMap(dungeonMap, currentRoom.getIndex());
             mapPane.toFront();
         } else {
             mapPane.toBack();
 
-            // turning OFF the map overlay
             movement.reset();
             movement.start();
         }
-
     }
 
     private void toggleInventory() {
         if (inventoryPane == null) return;
         inventoryVisible = !inventoryVisible;
+        log.debug("{} inventory overlay", inventoryVisible ? "Showing" : "Hiding");
         inventoryPane.setVisible(inventoryVisible);
         if (inventoryVisible) {
-            // Refresh the inventory UI each time it's shown, in case of changes
             inventoryController.refreshUI();
-            inventoryPane.toFront();  // bring overlay to top if using StackPane
+            inventoryPane.toFront();
         } else {
-            inventoryPane.toBack();   // optional: send it behind when hidden
+            inventoryPane.toBack();
         }
     }
 
 
     private void loadDefinitions() {
         ObjectMapper mapper = new ObjectMapper();
+        log.debug("Loading JSON definitions for obstacles, items, enemies, doors, chests");
         try {
-            // load all GameItem objects
             gameItemDefs = GameItemFactory.loadAll();
         } catch (Exception e) {
             e.printStackTrace();
@@ -419,6 +393,7 @@ public class RoomController {
     }
 
     public void backToMainMenu() {
+        log.info("Returning to Main Menu from RoomController");
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/game/javasem/fxml/MainMenu.fxml"));
             Parent menuRoot = loader.load();

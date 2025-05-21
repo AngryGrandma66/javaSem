@@ -6,113 +6,134 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.AnchorPane;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 public class InventoryController {
+    private static final Logger log = LoggerFactory.getLogger(InventoryController.class);
+
     @FXML private GridPane inventoryGrid;
     @FXML private ImageView weaponSlotIcon;
     @FXML private ImageView armorSlotIcon;
     @FXML private ImageView amuletSlotIcon;
     @FXML private Label healthLabel;
-    @FXML private javafx.scene.layout.AnchorPane inventoryRoot;  // The root overlay pane
+    @FXML private AnchorPane inventoryRoot;
 
-    private Player player;  // reference to the player (set from RoomController)
+    private Player player;
 
-    // This method can be called by the main controller to inject the player data
     public void setPlayer(Player player) {
         this.player = player;
+        log.debug("Player set in InventoryController: {}", player);
         refreshUI();
     }
 
     @FXML
     private void initialize() {
-        // Set up click handlers for equipment slot icons to unequip items
         weaponSlotIcon.setOnMouseClicked(e -> unequipItem(GameItem.Type.WEAPON));
         armorSlotIcon.setOnMouseClicked(e -> unequipItem(GameItem.Type.ARMOR));
         amuletSlotIcon.setOnMouseClicked(e -> unequipItem(GameItem.Type.AMULET));
+        log.debug("InventoryController initialized");
     }
 
-    /** Refresh the entire inventory UI (call this when opening the overlay or after changes). */
     public void refreshUI() {
-        if (player == null) return;
-        // Update health label (current health and max health including equipment bonuses)
+        if (player == null) {
+            log.warn("refreshUI called with null player");
+            return;
+        }
+        log.info("Refreshing inventory UI for player {}", player);
         healthLabel.setText("Health: " + player.getMaxHealth());
 
-        // Update equipped slot icons (show equipped item icons or empty if none)
+        // Equipment slots
         if (player.getEquippedWeapon() != null) {
             weaponSlotIcon.setImage(player.getEquippedWeapon().getIcon());
+            log.debug("Weapon slot icon set to {}", player.getEquippedWeapon().getName());
         } else {
-            weaponSlotIcon.setImage(null);  // or set a placeholder image for empty slot
+            weaponSlotIcon.setImage(null);
+            log.debug("Weapon slot cleared");
         }
         if (player.getEquippedArmor() != null) {
             armorSlotIcon.setImage(player.getEquippedArmor().getIcon());
+            log.debug("Armor slot icon set to {}", player.getEquippedArmor().getName());
         } else {
             armorSlotIcon.setImage(null);
+            log.debug("Armor slot cleared");
         }
         if (player.getEquippedAmulet() != null) {
             amuletSlotIcon.setImage(player.getEquippedAmulet().getIcon());
+            log.debug("Amulet slot icon set to {}", player.getEquippedAmulet().getName());
         } else {
             amuletSlotIcon.setImage(null);
+            log.debug("Amulet slot cleared");
         }
 
-        // Populate inventory grid with backpack items
-        inventoryGrid.getChildren().clear();  // remove old icons
+        // Inventory grid
+        inventoryGrid.getChildren().clear();
         List<GameItem> items = player.getInventory().getItems();
-        System.out.println("awdada"+items.toString());
-        int columns = 4;  // for example, 4 columns in grid
+        log.debug("Populating inventory grid with {} items", items.size());
+
+        int columns = 4;
         for (int i = 0; i < items.size(); i++) {
             GameItem item = items.get(i);
             ImageView itemIcon = new ImageView(item.getIcon());
             itemIcon.setFitWidth(32);
             itemIcon.setFitHeight(32);
 
-            // Tooltip on hover to show item details
             Tooltip tooltip = new Tooltip(item.getDescription());
             Tooltip.install(itemIcon, tooltip);
 
-            // Click handler: equip or unequip the item when clicked
             itemIcon.setOnMouseClicked((MouseEvent e) -> {
+                log.info("Clicked on inventory item {}", item.getName());
                 equipOrToggleItem(item);
             });
 
-            // Add the item icon to the grid at row/column
             int col = i % columns;
             int row = i / columns;
             inventoryGrid.add(itemIcon, col, row);
         }
     }
 
-    /** Equip the given item if not equipped, or unequip it if it is currently equipped. */
     private void equipOrToggleItem(GameItem item) {
-        if (item.getType() == GameItem.Type.WEAPON) {
-            // If clicking a weapon
-            if (player.getEquippedWeapon() == item) {
-                // If this weapon is already equipped, unequip it
-                player.unequipItem(GameItem.Type.WEAPON);
-            } else {
-                player.equipItem(item);  // will handle replacing any currently equipped weapon
+        log.info("equipOrToggleItem: {}", item.getName());
+        switch (item.getType()) {
+            case WEAPON -> {
+                if (player.getEquippedWeapon() == item) {
+                    log.debug("Unequipping weapon {}", item.getName());
+                    player.unequipItem(GameItem.Type.WEAPON);
+                } else {
+                    log.debug("Equipping weapon {}", item.getName());
+                    player.equipItem(item);
+                }
             }
-        } else if (item.getType() == GameItem.Type.ARMOR) {
-            if (player.getEquippedArmor() == item) {
-                player.unequipItem(GameItem.Type.ARMOR);
-            } else {
-                player.equipItem(item);
+            case ARMOR -> {
+                if (player.getEquippedArmor() == item) {
+                    log.debug("Unequipping armor {}", item.getName());
+                    player.unequipItem(GameItem.Type.ARMOR);
+                } else {
+                    log.debug("Equipping armor {}", item.getName());
+                    player.equipItem(item);
+                }
             }
-        } else if (item.getType() == GameItem.Type.AMULET) {
-            if (player.getEquippedAmulet() == item) {
-                player.unequipItem(GameItem.Type.AMULET);
-            } else {
-                player.equipItem(item);
+            case AMULET -> {
+                if (player.getEquippedAmulet() == item) {
+                    log.debug("Unequipping amulet {}", item.getName());
+                    player.unequipItem(GameItem.Type.AMULET);
+                } else {
+                    log.debug("Equipping amulet {}", item.getName());
+                    player.equipItem(item);
+                }
             }
+            default -> log.warn("Clicked item of unsupported type: {}", item.getType());
         }
-        refreshUI();  // update UI to reflect changes
+        refreshUI();
     }
 
-    /** Unequip item from a given slot (called when clicking equipped slot icons). */
     private void unequipItem(GameItem.Type slotType) {
+        log.info("unequipItem slot {}", slotType);
         player.unequipItem(slotType);
         refreshUI();
     }

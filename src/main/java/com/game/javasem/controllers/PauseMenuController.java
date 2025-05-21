@@ -1,48 +1,48 @@
 package com.game.javasem.controllers;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.game.javasem.model.Player;
-import com.game.javasem.model.SaveData;
-import com.game.javasem.model.SaveManager;
-import com.game.javasem.model.map.DungeonMap;
+import com.game.javasem.model.gameState.SaveManager;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.stage.Stage;
-import java.io.File;
-import com.game.javasem.model.GameItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.stream.Collectors;
 
 public class PauseMenuController {
-    @FXML private Button resumeButton;
-    @FXML private Button saveButton;
-    @FXML private Button exitButton;
+    private static final Logger log = LoggerFactory.getLogger(PauseMenuController.class);
 
     private RoomController rc;
     private Stage stage;
     private Scene previousScene;
 
     public void init(RoomController rc, Stage st, Scene prev) {
-        this.rc= rc;
+        this.rc = rc;
         this.stage = st;
         this.previousScene = prev;
+        log.debug("PauseMenuController initialized with RoomController and previous scene");
     }
 
     @FXML
     private void handleResume() {
+        log.info("Resuming game, returning to room view");
         stage.setScene(previousScene);
     }
 
     @FXML
-    private void handleSave() throws IOException {
-        SaveManager saveManager = new SaveManager();
-        saveManager.save(rc);
+    private void handleSave() {
+        log.info("User requested game save");
+        try {
+            new SaveManager().save(rc);
+            log.info("Game successfully saved");
+        } catch (IOException e) {
+            log.error("Failed to save game", e);
+        }
     }
+
     @FXML
     private void handleExit() {
-       rc.backToMainMenu();
+        log.info("Exiting to main menu");
+        rc.backToMainMenu();
     }
 }

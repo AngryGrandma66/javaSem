@@ -13,49 +13,48 @@ import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class BattleController {
-    @FXML
-    private ProgressBar playerHealthBar;
-    @FXML
-    private ProgressBar enemyHealthBar;
-    @FXML
-    private ImageView playerSprite;
-    @FXML
-    private ImageView enemySprite;
-    @FXML
-    private HBox attackButtons;
+    private static final Logger log = LoggerFactory.getLogger(BattleController.class);
+
+    @FXML private ProgressBar playerHealthBar;
+    @FXML private ProgressBar enemyHealthBar;
+    @FXML private ImageView playerSprite;
+    @FXML private ImageView enemySprite;
+    @FXML private HBox attackButtons;
 
     private Player player;
     private Enemy enemy;
-    private Scene previousScene;
     private Stage stage;
     private RoomController roomController;
 
-    private Map<Attack, Integer> playerCooldowns = new HashMap<>();
-    private Map<Attack, Integer> enemyCooldowns = new HashMap<>();
-
+    private final Map<Attack, Integer> playerCooldowns = new HashMap<>();
+    private final Map<Attack, Integer> enemyCooldowns  = new HashMap<>();
 
     public void startBattle(Player player, Enemy enemy, RoomController rc, Scene prevScene) {
         this.player = player;
-        this.enemy = enemy;
+        this.enemy  = enemy;
         this.roomController = rc;
-        this.previousScene = prevScene;
         this.stage = (Stage) prevScene.getWindow();
 
-        // init cooldowns
-        for (Attack atk : player.getEquippedWeapon().getAttacks()) playerCooldowns.put(atk, 0);
-        for (Attack atk : enemy.getAttacks()) enemyCooldowns.put(atk, 0);
+        log.info("Battle started: player HP={} vs enemy '{}' HP={}",
+                player.getCurrentHealth(), enemy.getType(), enemy.getHealth());
 
-        // set sprites
+        player.getEquippedWeapon().getAttacks()
+                .forEach(atk -> playerCooldowns.put(atk, 0));
+        enemy.getAttacks()
+                .forEach(atk -> enemyCooldowns.put(atk, 0));
+
         playerSprite.setImage(player.getEquippedWeapon().getIcon());
         enemySprite.setImage(new Image(
-                Objects.requireNonNull(
-                        getClass().getResourceAsStream("/com/game/javasem/images/" + enemy.getSprite())
-                )
+                Objects.requireNonNull(getClass()
+                        .getResourceAsStream("/com/game/javasem/images/" + enemy.getSprite()))
         ));
+
         player.setCurrentHealth(player.getMaxHealth());
         updateHealthBars();
         renderAttackButtons();
@@ -73,20 +72,24 @@ public class BattleController {
     }
 
     private void playerTurn(Attack atk) {
-        // Player attacks
+        log.info("Player uses '{}' for {} damage", atk.getName(), atk.getDamage());
         enemy.setCurrentHealth(enemy.getCurrentHealth() - atk.getDamage());
         playerCooldowns.put(atk, atk.getCooldown());
         updateHealthBars();
+
         if (enemy.getCurrentHealth() <= 0) {
+            log.info("Enemy '{}' defeated!", enemy.getType());
             endBattle(true);
             return;
         }
 
-        // Enemy attacks
         enemyTurn();
-        if (player.getCurrentHealth() <= 0) return;
+        if (player.getCurrentHealth() <= 0) {
+            // enemyTurn already logs defeat
+            return;
+        }
 
-        // decrement cooldowns
+        // tick down cooldowns
         playerCooldowns.replaceAll((a, c) -> Math.max(0, c - 1));
         enemyCooldowns.replaceAll((a, c) -> Math.max(0, c - 1));
         renderAttackButtons();
@@ -95,25 +98,39 @@ public class BattleController {
     private void enemyTurn() {
         List<Attack> available = new ArrayList<>();
         for (Attack atk : enemy.getAttacks()) {
-            if (enemyCooldowns.getOrDefault(atk, 0) == 0) available.add(atk);
+            if (enemyCooldowns.getOrDefault(atk, 0) == 0) {
+                available.add(atk);
+            }
         }
-        if (!available.isEmpty()) {
-            Attack choice = available.get(new Random().nextInt(available.size()));
-            player.setCurrentHealth(player.getCurrentHealth() - choice.getDamage());
-            enemyCooldowns.put(choice, choice.getCooldown());
-            updateHealthBars();
-            if (player.getCurrentHealth() <= 0) endBattle(false);
+        if (available.isEmpty()) {
+            log.debug("Enemy '{}' has no attacks available (all on cooldown)", enemy.getType());
+            return;
+        }
+
+        Attack choice = available.get(new Random().nextInt(available.size()));
+        log.info("Enemy '{}' uses '{}' for {} damage", enemy.getType(),
+                choice.getName(), choice.getDamage());
+        player.setCurrentHealth(player.getCurrentHealth() - choice.getDamage());
+        enemyCooldowns.put(choice, choice.getCooldown());
+        updateHealthBars();
+
+        if (player.getCurrentHealth() <= 0) {
+            log.info("Player defeated by enemy '{}'", enemy.getType());
+            endBattle(false);
         }
     }
 
     private void updateHealthBars() {
-        playerHealthBar.setProgress((double) player.getCurrentHealth() / player.getMaxHealth());
-        enemyHealthBar.setProgress((double) enemy.getCurrentHealth() / enemy.getHealth());
+        double pPct = (double) player.getCurrentHealth() / player.getMaxHealth();
+        double ePct = (double) enemy.getCurrentHealth() / enemy.getHealth();
+        playerHealthBar.setProgress(pPct);
+        enemyHealthBar.setProgress(ePct);
+        log.debug("Health update → player: {}%, enemy: {}%",
+                Math.round(pPct*100), Math.round(ePct*100));
     }
 
     private void endBattle(boolean playerWon) {
         if (playerWon) {
-            // award loot and handle boss
             roomController.handleBattleEnd(enemy);
         } else {
             try {
@@ -122,7 +139,7 @@ public class BattleController {
                 );
                 stage.setScene(new Scene(root));
             } catch (Exception ex) {
-                ex.printStackTrace();
+                log.error("Error loading GameOver screen", ex);
             }
         }
     }

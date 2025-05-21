@@ -1,6 +1,6 @@
 package com.game.javasem.model.map;
 
-import com.game.javasem.model.RoomState;
+import com.game.javasem.model.gameState.RoomState;
 import com.game.javasem.model.mapObjects.MapObject;
 
 import java.util.*;

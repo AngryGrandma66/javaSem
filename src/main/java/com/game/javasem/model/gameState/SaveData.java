@@ -1,4 +1,4 @@
-package com.game.javasem.model;
+package com.game.javasem.model.gameState;
 
 import java.util.List;
 

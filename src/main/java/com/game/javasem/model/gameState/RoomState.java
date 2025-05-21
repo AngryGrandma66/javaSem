@@ -1,4 +1,4 @@
-package com.game.javasem.model;
+package com.game.javasem.model.gameState;
 
 import com.game.javasem.model.map.Room;
 import com.game.javasem.model.mapObjects.MapObject;

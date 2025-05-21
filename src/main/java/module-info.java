@@ -4,6 +4,9 @@ module com.game.javasem {
 
     requires org.controlsfx.controls;
     requires com.fasterxml.jackson.databind;
+    requires ch.qos.logback.classic;
+    requires java.logging;
+    requires org.slf4j;
 
 
     opens com.game.javasem.controllers to javafx.fxml;
@@ -16,4 +19,6 @@ module com.game.javasem {
     exports com.game.javasem.controllers;
     exports com.game.javasem.model.map to com.fasterxml.jackson.databind;
     opens com.game.javasem.model.map to com.fasterxml.jackson.databind;
+    exports com.game.javasem.model.gameState to com.fasterxml.jackson.databind;
+    opens com.game.javasem.model.gameState to com.fasterxml.jackson.databind;
 }

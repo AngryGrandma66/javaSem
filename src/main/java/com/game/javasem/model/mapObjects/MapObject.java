@@ -5,14 +5,17 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.game.javasem.controllers.RoomController;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "category")
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY, // look for the type‐id in the JSON property
+        property = "category"               // <-- this must match your JSON
+)
 @JsonSubTypes({
+        @JsonSubTypes.Type(value = Door.class,     name = "door"),
         @JsonSubTypes.Type(value = Obstacle.class, name = "obstacle"),
-        @JsonSubTypes.Type(value = Item.class, name = "item"),
-        @JsonSubTypes.Type(value = Enemy.class, name = "enemy"),
-        @JsonSubTypes.Type(value = Door.class, name = "door"),
-        @JsonSubTypes.Type(value = Chest.class, name = "chest")
-
+        @JsonSubTypes.Type(value = Chest.class,    name = "chest"),
+        @JsonSubTypes.Type(value = Enemy.class,    name = "enemy"),
+        @JsonSubTypes.Type(value = Item.class,     name = "item")
 })
 public abstract class MapObject implements Cloneable {
     @Override

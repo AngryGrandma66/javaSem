@@ -16,8 +16,6 @@ public class MapGenerator {
     private final int maxRooms;
 
     public MapGenerator(int gridSize, int minRooms, int maxRooms) {
-        if (minRooms < 1 || maxRooms < minRooms)
-            throw new IllegalArgumentException("must have 1 ≤ minRooms ≤ maxRooms");
         this.gridSize = gridSize;
         this.minRooms = minRooms;
         this.maxRooms = maxRooms;

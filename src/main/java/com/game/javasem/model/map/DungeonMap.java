@@ -24,6 +24,11 @@ public class DungeonMap {
         int startCol = gridSize / 2;
         this.startIndex = startRow * gridSize + startCol;
     }
+    public DungeonMap(int gridSize, Room[] rooms,int startIndex) {
+        this.gridSize = gridSize;
+        this.rooms    = rooms;
+        this.startIndex =startIndex ;
+    }
 
     /** @return the flat array of all cells/rooms */
     public Room[] getRooms() {

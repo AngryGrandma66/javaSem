@@ -1,8 +1,6 @@
 package com.game.javasem.controllers;
 
-import com.game.javasem.model.GameItem;
-import com.game.javasem.model.GameItemFactory;
-import com.game.javasem.model.Player;
+import com.game.javasem.model.*;
 import com.game.javasem.model.map.DungeonMap;
 import com.game.javasem.model.map.Room;
 import com.game.javasem.controllers.RoomController;
@@ -13,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class MainMenuController {
@@ -49,7 +48,7 @@ public class MainMenuController {
 
 // 3) Create the player *with* defaults
             Player player = new Player(
-                    10,
+                    40,
                     starterWeapon,
                     starterArmor,
                     starterAmulet
@@ -69,8 +68,52 @@ public class MainMenuController {
     }
 
     @FXML
-    private void handleLoadGame() {
-        System.out.println("Load Game button clicked!");
-        // TODO: Add logic to load a saved game
+    private void handleLoadGame() throws Exception {
+        SaveData sd = new SaveManager().load();
+
+        // 1) make an “empty” map of the right size:
+        Room[] restored = sd.dungeon.rooms.stream()
+                .map(RoomState::toRoom)      // or new Room(rs)
+                .toArray(Room[]::new);
+
+// 2) Create a fresh DungeonMap pointing at exactly those Room instances:
+        DungeonMap dm = new DungeonMap(
+                sd.dungeon.gridSize,        // size
+                restored,                     // your new constructor taking Room[]
+                sd.currentRoomIndex
+        );
+
+        Map<String, GameItem> allItems = GameItemFactory.loadAll();
+        Player p = new Player(
+                40,
+                allItems.get(sd.equippedWeaponId),
+                allItems.get(sd.equippedArmorId),
+                allItems.get(sd.equippedAmuletId)
+        );
+        // fill inventory:
+        for (String id : sd.inventoryItemIds) {
+            GameItem it = GameItemFactory.loadAll().get(id);
+            p.getInventory().addItem(it);
+        }
+
+
+        // 4) boot up the RoomController exactly like NewGame:
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/game/javasem/fxml/Room.fxml"));
+        Parent root = loader.load();
+
+        RoomController rc = loader.getController();
+
+
+        Scene s = new Scene(root);
+        Stage primary= (Stage)loadGameButton.getScene().getWindow();        primary.setScene(s);
+        primary.setTitle("Dungeon Explorer (loaded)");
+        primary.setScene(s);
+        rc.setPlayer(p);
+        rc.setDungeonMap(dm);
+        rc.initialize();
+        rc.setScene(s);
+        Room start = dm.getRooms()[sd.currentRoomIndex];
+        rc.showRoom(start);
     }
 }

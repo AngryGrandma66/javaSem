@@ -7,7 +7,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 
 public class MovementController {
-    private static final double SPEED = 500;
+    private static final double SPEED = 400;
 
     private final ImageView character;
     private final Pane      tileLayer;
@@ -70,25 +70,7 @@ public class MovementController {
         };
     }
 
-    /** Bind arrow/WASD to movement flags. */
-    public void bind(Scene scene) {
-        scene.setOnKeyPressed(e -> {
-            switch (e.getCode()) {
-                case UP, W    -> movingUp    = true;
-                case DOWN, S  -> movingDown  = true;
-                case LEFT, A  -> movingLeft  = true;
-                case RIGHT, D -> movingRight = true;
-            }
-        });
-        scene.setOnKeyReleased(e -> {
-            switch (e.getCode()) {
-                case UP, W    -> movingUp    = false;
-                case DOWN, S  -> movingDown  = false;
-                case LEFT, A  -> movingLeft  = false;
-                case RIGHT, D -> movingRight = false;
-            }
-        });
-    }
+
     public void placeAtDoor(Door door, double cellW, double cellH, double gap) {
         // get character dimensions
         double charW = character.getBoundsInLocal().getWidth();

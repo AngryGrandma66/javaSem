@@ -1,24 +1,50 @@
 package com.game.javasem.model.map;
 
+import com.game.javasem.model.RoomState;
 import com.game.javasem.model.mapObjects.MapObject;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Room {
     private final int index;
     private final int gridSize;
     private boolean exists;
     private boolean boss;
-    private final List<String> doors = new ArrayList<>();
+    private List<String> doors = new ArrayList<>();
 
     // Which door directions this layout supports: "U", "D", "L", "R"
-    private final Set<String> layoutFlags = new HashSet<>();
+    private Set<String> layoutFlags = new HashSet<>();
     // The actual tile blueprint for this room (parsed JSON or custom object)
     private List<List<MapObject>> layout;
 
     public Room(int index, int gridSize) {
         this.index = index;
         this.gridSize = gridSize;
+    }
+    public Room(RoomState rs) {
+        this.index       = rs.index;
+        this.exists      = rs.exists;
+        this.boss        = rs.boss;
+        this.gridSize    = rs.gridSize;
+        this.doors       = new ArrayList<>(rs.doors);
+        this.layoutFlags = new HashSet<>(rs.layoutFlags);
+
+        this.layout      = rs.layout!=null?cloneLayout(rs.layout):null; // deep-clone your MapObjects
+        // any other fields...
+    }
+
+    // helper to deep-copy your saved layout of MapObjects
+    private List<List<MapObject>> cloneLayout(List<List<MapObject>> saved) {
+        return saved.stream()
+                .map(row ->
+                        row == null
+                                ? null
+                                : row.stream()
+                                .map(obj -> obj == null ? null : obj.clone())
+                                .collect(Collectors.toList())
+                )
+                .collect(Collectors.toList());
     }
 
     public int getIndex() {
@@ -76,7 +102,7 @@ public class Room {
         return layoutFlags.containsAll(required);
     }
 
-    void clearLayoutFlags() {
+    public void clearLayoutFlags() {
         layoutFlags.clear();
     }
 

@@ -23,7 +23,7 @@
   },
   "dragon": {
     "sprite": "dragon.png",
-    "health": 1,
+    "health": 100,
     "attacks": [
       { "name": "Fire Breath", "damage": 20, "cooldown": 3 },
       { "name": "Tail Swipe",  "damage": 25, "cooldown": 3 },

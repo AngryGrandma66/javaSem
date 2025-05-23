@@ -15,6 +15,18 @@ public class DungeonMap {
      * @param gridSize number of rows/columns in the square map grid
      */
     public DungeonMap(int gridSize, int minRooms, int maxRooms) throws Exception {
+        // Validate parameters
+        if (gridSize < 3 || gridSize > 100) {
+            throw new IllegalArgumentException("gridSize must be between 3 and 100, but was " + gridSize);
+        }
+        int maxPossible = gridSize * gridSize;
+        if (minRooms < 1 || minRooms > maxPossible) {
+            throw new IllegalArgumentException("minRooms must be between 1 and " + maxPossible + ", but was " + minRooms);
+        }
+        if (maxRooms < minRooms || maxRooms > maxPossible) {
+            throw new IllegalArgumentException("maxRooms must be between minRooms (" + minRooms + ") and " + maxPossible + ", but was " + maxRooms);
+        }
+
         this.gridSize = gridSize;
         loadTemplates(loadAll());
         MapGenerator generator = new MapGenerator(gridSize, minRooms, maxRooms);
@@ -24,6 +36,7 @@ public class DungeonMap {
         int startCol = gridSize / 2;
         this.startIndex = startRow * gridSize + startCol;
     }
+
     public DungeonMap(int gridSize, Room[] rooms,int startIndex) {
         this.gridSize = gridSize;
         this.rooms    = rooms;

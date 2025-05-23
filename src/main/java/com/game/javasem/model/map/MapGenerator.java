@@ -26,10 +26,25 @@ public class MapGenerator {
     }
 
     public Room[] generate() {
-        carveRooms();
+        // keep trying until we get a good room count
+        do {
+            resetRooms();
+            carveRooms();
+        } while (totalRooms() < minRooms || totalRooms() > maxRooms);
+
         assignBossRoom();
         assignLayouts();
         return rooms;
+    }
+
+    /** Clears all per-room state so we can carve from scratch. */
+    private void resetRooms() {
+        for (Room r : rooms) {
+            r.setExists(false);
+            r.setBoss(false);
+            r.clearLayoutFlags();
+            r.setLayout(null);
+        }
     }
 
     private void carveRooms() {
@@ -52,7 +67,26 @@ public class MapGenerator {
         };
 
         // Phase 1: FORCE-grow until minRooms hit (no randomness)
-        while (totalRooms() < minRooms && !frontier.isEmpty()) {
+        while (totalRooms() < minRooms) {
+            if (frontier.isEmpty()) {
+                // refill frontier from *all* existing rooms that still have a free neighbor
+                for (int idx = 0; idx < rooms.length; idx++) {
+                    if (!rooms[idx].exists()) continue;
+                    int r = idx / gridSize, c = idx % gridSize;
+                    for (var d : DIRS) {
+                        int nr = r + d[0], nc = c + d[1];
+                        if (nr < 0 || nr >= gridSize || nc < 0 || nc >= gridSize) continue;
+                        int nIdx = nr*gridSize + nc;
+                        if (!rooms[nIdx].exists()) {
+                            frontier.add(idx);
+                            break;
+                        }
+                    }
+                }
+            }
+            // still empty? grid is full or something’s wrong, so bail
+            if (frontier.isEmpty()) break;
+
             int idx = frontier.remove(rnd.nextInt(frontier.size()));
             int r = idx / gridSize, c = idx % gridSize;
 
@@ -69,7 +103,25 @@ public class MapGenerator {
         }
 
         // Phase 2: random-grow up to maxRooms
-        while (totalRooms() < maxRooms && !frontier.isEmpty()) {
+        while (totalRooms() < maxRooms) {
+            if (frontier.isEmpty()) {
+                // same refill trick as above
+                for (int idx = 0; idx < rooms.length; idx++) {
+                    if (!rooms[idx].exists()) continue;
+                    int r = idx / gridSize, c = idx % gridSize;
+                    for (var d : DIRS) {
+                        int nr = r + d[0], nc = c + d[1];
+                        if (nr < 0 || nr >= gridSize || nc < 0 || nc >= gridSize) continue;
+                        int nIdx = nr*gridSize + nc;
+                        if (!rooms[nIdx].exists()) {
+                            frontier.add(idx);
+                            break;
+                        }
+                    }
+                }
+            }
+            if (frontier.isEmpty()) break;
+
             int idx = frontier.remove(rnd.nextInt(frontier.size()));
             int r = idx / gridSize, c = idx % gridSize;
 
@@ -86,6 +138,7 @@ public class MapGenerator {
             }
         }
     }
+
 
     private int countNeighbors(int idx) {
         int count = 0;

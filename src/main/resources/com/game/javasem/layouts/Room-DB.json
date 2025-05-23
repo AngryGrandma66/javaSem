@@ -1,20 +1,456 @@
-{ "id": "DownBoss", "flags": [
-"D",
-"B"
-], "layout": [
-[{ "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, null, null, null, { "category": "enemy", "type": "dragon" }, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "door", "sprite": "DoorDown" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }, { "category": "obstacle", "sprite": "wall" }]
-] }
+{
+  "id": "DownBoss",
+  "flags": [
+    "D",
+    "B"
+  ],
+  "layout": [
+    [
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      }
+    ],
+    [
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      }
+    ],
+    [
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      }
+    ],
+    [
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      }
+    ],
+    [
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      }
+    ],
+    [
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      }
+    ],
+    [
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      }
+    ],
+    [
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      null,
+      null,
+      null,
+      {
+        "category": "enemy",
+        "type": "dragon"
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      }
+    ],
+    [
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      }
+    ],
+    [
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      }
+    ],
+    [
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      }
+    ],
+    [
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      }
+    ],
+    [
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      }
+    ],
+    [
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      }
+    ],
+    [
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "door",
+        "sprite": "DoorDown"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      },
+      {
+        "category": "obstacle",
+        "sprite": "wall"
+      }
+    ]
+  ]
+}

@@ -7,7 +7,7 @@
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, { "category": "chest", "sprite": "silverChest" } , null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
-[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
+[{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, {"category": "obstacle","sprite": "wall"}, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null,null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
 [{ "category": "obstacle", "sprite": "wall" }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { "category": "obstacle", "sprite": "wall" }],
